@@ -15,21 +15,21 @@ const initialWorkOrders: WorkOrder[] = [
     machine: "Pellet Mill 01",
     requestor: "Tutur",
     priority: "Critical",
-    section: "K1",
+    section: "Section 1",
   },
   {
     code: "WO-2026-082",
     machine: "Rotary Dryer",
     requestor: "Nastain",
     priority: "High",
-    section: "K2",
+    section: "Section 2",
   },
   {
     code: "WO-2026-083",
     machine: "WHM 02",
     requestor: "Heri",
     priority: "Medium",
-    section: "K3",
+    section: "Section 3",
   },
 ];
 
@@ -314,10 +314,11 @@ export default function MaintenanceDashboard() {
                 }}
               >
                 <option value="All Section">All Section</option>
-                <option value="K1">K1</option>
-                <option value="K2">K2</option>
-                <option value="K3">K3</option>
-                <option value="K4">K4</option>
+                <option value="Section 1">Section 1</option>
+                <option value="Section 2">Section 2</option>
+                <option value="Section 3">Section 3</option>
+                <option value="Section 4">Section 4</option>
+                <option value="Section 5">Section 5</option>
               </select>
             </label>
           </div>
