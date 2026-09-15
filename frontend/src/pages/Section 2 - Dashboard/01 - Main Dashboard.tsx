@@ -8,9 +8,6 @@ type WorkOrder = {
   section: string;
 };
 
-type MenuItem = {
-  label: string;
-};
 
 const initialWorkOrders: WorkOrder[] = [
   {
@@ -36,17 +33,6 @@ const initialWorkOrders: WorkOrder[] = [
   },
 ];
 
-const menuItems: MenuItem[] = [
-  { label: "Dashboard" },
-  { label: "Work Orders" },
-  { label: "Equipment" },
-  { label: "Preventive Maintenance" },
-  { label: "Spare Parts" },
-  { label: "Maintenance Calendar" },
-  { label: "Reports" },
-  { label: "User Management" },
-];
-
 const colors = {
   maroon: "#681813",
   maroonLight: "#87241C",
@@ -63,15 +49,12 @@ const colors = {
 };
 
 export default function MaintenanceDashboard() {
-  const [activeMenu, setActiveMenu] = useState("Dashboard");
-
   const [period, setPeriod] = useState("29 Aug 2026");
   const [focusSection, setFocusSection] = useState("All Section");
   const [searchText, setSearchText] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const [workOrders, setWorkOrders] =
-    useState<WorkOrder[]>(initialWorkOrders);
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>(initialWorkOrders);
 
   const [selectedWorkOrder, setSelectedWorkOrder] =
     useState<WorkOrder | null>(null);
@@ -141,128 +124,6 @@ export default function MaintenanceDashboard() {
         fontFamily: "Inter, Arial, sans-serif",
       }}
     >
-      {/* SIDEBAR */}
-      <aside
-        style={{
-            width: "clamp(190px, 17vw, 248px)",
-            height: "100vh",
-            position: "sticky",
-            top: 0,
-            alignSelf: "flex-start",
-            padding: "28px 18px 20px",
-            background: colors.maroon,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            flexShrink: 0,
-            overflowY: "auto",
-        }}
-    >
-        <div>
-          <div style={{ marginBottom: "24px" }}>
-            <div
-              style={{
-                color: "white",
-                fontSize: "28px",
-                fontWeight: 700,
-                marginBottom: "8px",
-              }}
-            >
-              CMMS
-            </div>
-
-            <div
-              style={{
-                color: colors.goldLight,
-                fontSize: "9px",
-                fontWeight: 700,
-              }}
-            >
-              MAINTENANCE MANAGEMENT
-            </div>
-          </div>
-
-          <nav
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
-            {menuItems.map((item) => {
-              const isActive = activeMenu === item.label;
-
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => setActiveMenu(item.label)}
-                  style={{
-                    width: "100%",
-                    minHeight: "42px",
-                    padding: "10px",
-                    border: isActive
-                      ? `1px solid ${colors.gold}`
-                      : "1px solid transparent",
-                    borderRadius: "8px",
-                    background: isActive
-                      ? colors.maroonLight
-                      : colors.maroon,
-                    color: "white",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    fontSize: "12px",
-                    fontWeight: 700,
-                  }}
-                >
-                  <span style={{ color: colors.gold }}>•</span>
-
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* USER PROFILE */}
-        <div
-          style={{
-            width: "100%",
-            minHeight: "54px",
-            padding: "10px",
-            background: colors.maroonDark,
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-          }}
-        >
-          <div
-            style={{
-              color: "white",
-              fontSize: "12px",
-              fontWeight: 700,
-            }}
-          >
-            SA
-          </div>
-
-          <div
-            style={{
-              color: "white",
-              fontSize: "11px",
-              fontWeight: 700,
-            }}
-          >
-            Syamsabillah
-            <br />
-            Engineering
-          </div>
-        </div>
-      </aside>
 
       {/* MAIN CONTENT */}
       <main
@@ -298,7 +159,7 @@ export default function MaintenanceDashboard() {
                 fontWeight: 700,
               }}
             >
-              {activeMenu}
+              Dashboard
             </h1>
 
             <p

@@ -1,5 +1,6 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {saveAuthSession,} from "../../utils/auth";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,45 +19,59 @@ export default function Login() {
     }
   }, []);
 
-  const handleSignIn = (event: FormEvent<HTMLFormElement>) => {
+  const handleSignIn = (
+  event: React.FormEvent<HTMLFormElement>
+) => {
   event.preventDefault();
 
   const dummyEmail = "admin@cmms.com";
   const dummyPassword = "admin123";
 
-  if (email === dummyEmail && password === dummyPassword) {
+  if (
+    email === dummyEmail &&
+    password === dummyPassword
+  ) {
     setError("");
 
-    if (rememberMe) {
-      localStorage.setItem("cmmsRememberedEmail", email);
-    } else {
-      localStorage.removeItem("cmmsRememberedEmail");
-    }
+    saveAuthSession("admin", email);
 
-    showLoginSuccess();
+    setShowSuccess(true);
+
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 1500);
   } else {
     setError("Email atau password salah.");
   }
 };
-const showLoginSuccess = () => {
-  setShowSuccess(true);
 
-  setTimeout(() => {
-    navigate("/dashboard");
-  }, 1500);
-};
-  const handleGuestLogin = () => {
-  setError("");
-  showLoginSuccess();
-};
+  const showLoginSuccess = (path: string) => {
+    setShowSuccess(true);
 
-  const handleForgotPassword = () => {
+    setTimeout(() => {
+      navigate(path);
+    }, 1500);
+  };
+
+  const handleOperatorLogin = () => {
+    setError("");
+
+    saveAuthSession("operator", "operator@cmms.com");
+
+    setShowSuccess(true);
+
+    setTimeout(() => {
+      navigate("/operator/work-orders");
+    }, 1500);
+  };
+
+  /*const handleForgotPassword = () => {
     alert("Fitur reset password belum tersedia.");
-  };
+  };*/
 
-  const handleCreateAccount = () => {
+  /*const handleCreateAccount = () => {
     alert("Fitur pembuatan akun belum tersedia.");
-  };
+  };*/
 
   return (
     <main className="login-page">
@@ -143,13 +158,13 @@ const showLoginSuccess = () => {
                   <span>Remember me</span>
                 </label>
 
-                <button
+                {/*<button
                   type="button"
                   className="forgot-password"
                   onClick={handleForgotPassword}
                 >
                   Forgot password?
-                </button>
+                </button>*/}
               </div>
 
               {/* Pesan error */}
@@ -163,22 +178,22 @@ const showLoginSuccess = () => {
 
                 <button
                   type="button"
-                  className="guest-login-button"
-                  onClick={handleGuestLogin}
+                  className="operator-login-button"
+                  onClick={handleOperatorLogin}
                 >
-                  Login as Guest
+                  Login as Operator
                 </button>
               </div>
             </form>
 
             {/* Register */}
-            <button
+            {/*<button
               type="button"
               className="create-account-button"
               onClick={handleCreateAccount}
             >
               New to CMMS?&nbsp; Create an account
-            </button>
+            </button>*/}
 
             {/* Akun dummy */}
             <div className="dummy-account">
