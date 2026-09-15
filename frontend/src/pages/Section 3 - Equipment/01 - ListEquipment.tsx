@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 
 import {
   equipmentData,
-  type EquipmentStatus,
 } from "../../datadummy/EquipmentData";
 
 export type EquipmentData = {
@@ -107,6 +106,7 @@ export default function EquipmentList() {
             <option value="1">Section 1</option>
             <option value="2">Section 2</option>
             <option value="3">Section 3</option>
+            <option value="4">Section 4</option>
             <option value="5">Section 5</option>
           </select>
         </div>

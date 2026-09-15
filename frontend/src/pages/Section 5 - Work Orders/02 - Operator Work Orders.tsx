@@ -166,6 +166,8 @@ export default function OperatorEwoForm() {
             Gunakan formulir ini untuk melaporkan
             kondisi darurat atau kritis pada mesin
             yang membutuhkan penanganan segera.
+            Tanda bintang (*) menunjukkan form wajib diisi. 
+            Pastikan untuk mengisi seluruh form wajib sebelum mengirim EWO.
           </p>
         </section>
 
@@ -240,7 +242,7 @@ export default function OperatorEwoForm() {
             </h2>
 
             <label style={styles.label}>
-              K Section *
+              Section *
             </label>
 
             <select
@@ -252,9 +254,11 @@ export default function OperatorEwoForm() {
               }
               style={styles.input}
             >
-              <option value="K1">K1</option>
-              <option value="K2">K2</option>
-              <option value="K3">K3</option>
+              <option value="Section 1">Section 1</option>
+              <option value="Section 2">Section 2</option>
+              <option value="Section 3">Section 3</option>
+              <option value="Section 4">Section 4</option>
+              <option value="Section 5">Section 5</option>
             </select>
 
             <label style={styles.label}>

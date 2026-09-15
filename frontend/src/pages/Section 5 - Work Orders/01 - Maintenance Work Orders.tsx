@@ -1,7 +1,4 @@
-import {
-  useMemo,
-  useState,
-} from "react";
+import {useMemo,useState,} from "react";
 
 import {
   dummyEwoData,
@@ -9,133 +6,146 @@ import {
   type EwoStatus,
 } from "../../datadummy/EwoData";
 
-const statusOptions: EwoStatus[] = [
-  "Pending",
-  "On Progress",
-  "Done",
-];
 
-export default function AdminWorkOrders() {
-  const [ewoList, setEwoList] =
-    useState<EwoData[]>(dummyEwoData);
+export default function WorkOrders() {
+  const [ewoData, setEwoData] = useState<EwoData[]>(dummyEwoData);
 
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] =
-    useState("All");
+  const [currentSearch, setCurrentSearch] = useState("");
+  const [historySearch, setHistorySearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All Status");
 
-  const filteredEwo = useMemo(() => {
-    return ewoList.filter((item) => {
-      const keyword = search.toLowerCase();
+  // Data EWO yang masih aktif
+  const currentEwo = useMemo(() => {
+    return ewoData.filter((ewo) => {
+      const isNotDone = ewo.status !== "Done";
 
-      const matchesSearch =
-        item.ewoCode.toLowerCase().includes(keyword) ||
-        item.equipment.toLowerCase().includes(keyword) ||
-        item.requestor.toLowerCase().includes(keyword);
+      const searchText = `
+        ${ewo.ewoCode}
+        ${ewo.requestor}
+        ${ewo.equipment}
+        ${ewo.section}
+      `.toLowerCase();
+
+      const matchesSearch = searchText.includes(
+        currentSearch.toLowerCase()
+      );
 
       const matchesStatus =
-        statusFilter === "All" ||
-        item.status === statusFilter;
+        statusFilter === "All Status" ||
+        ewo.status === statusFilter;
 
-      return matchesSearch && matchesStatus;
+      return isNotDone && matchesSearch && matchesStatus;
     });
-  }, [ewoList, search, statusFilter]);
+  }, [ewoData, currentSearch, statusFilter]);
 
-  const updateStatus = (
+  // Data yang sudah selesai dan masuk history
+  const historyEwo = useMemo(() => {
+    return ewoData.filter((ewo) => {
+      const isDone = ewo.status === "Done";
+
+      const searchText = `
+        ${ewo.ewoCode}
+        ${ewo.requestor}
+        ${ewo.equipment}
+        ${ewo.section}
+      `.toLowerCase();
+
+      return (
+        isDone &&
+        searchText.includes(historySearch.toLowerCase())
+      );
+    });
+  }, [ewoData, historySearch]);
+
+  // Mengubah status EWO
+  const handleStatusChange = (
     id: string,
-    nextStatus: EwoStatus,
+    newStatus: EwoStatus
   ) => {
-    setEwoList((previous) =>
-      previous.map((item) => {
-        if (item.id !== id) {
-          return item;
+    setEwoData((previousData) =>
+      previousData.map((ewo) => {
+        if (ewo.id !== id) {
+          return ewo;
         }
 
         return {
-          ...item,
-          status: nextStatus,
+          ...ewo,
+          status: newStatus,
           completedAt:
-            nextStatus === "Done"
-              ? new Date().toLocaleDateString(
-                  "en-GB",
-                  {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  },
-                )
+            newStatus === "Done"
+              ? ewo.completedAt ?? "15 Sep 2026"
               : undefined,
         };
-      }),
+      })
     );
   };
 
-  const total = ewoList.length;
-
-  const pending = ewoList.filter(
-    (item) => item.status === "Pending",
+  const totalEwo = ewoData.length;
+  const pendingEwo = ewoData.filter(
+    (ewo) => ewo.status === "Pending"
   ).length;
-
-  const onProgress = ewoList.filter(
-    (item) => item.status === "On Progress",
+  const onProgressEwo = ewoData.filter(
+    (ewo) => ewo.status === "On Progress"
   ).length;
-
-  const done = ewoList.filter(
-    (item) => item.status === "Done",
+  const doneEwo = ewoData.filter(
+    (ewo) => ewo.status === "Done"
   ).length;
 
   return (
-    <div style={styles.page}>
-      <header style={styles.header}>
+    <div className="work-orders-page">
+      <header className="page-header">
         <div>
-          <h1 style={styles.pageTitle}>
-            Work Orders
-          </h1>
-
-          <p style={styles.subtitle}>
-            Monitoring Emergency Work Order
-          </p>
+          <h1>Work Orders</h1>
+          <p>Monitoring Emergency Work Order</p>
         </div>
 
-        <div style={styles.avatar}>
-          SA
-        </div>
+        <div className="profile-initial">SA</div>
       </header>
 
-      <section style={styles.summaryGrid}>
-        <SummaryCard
-          label="Total Work Orders"
-          value={total}
-          color="#751b17"
-        />
+      {/* ================= KPI ================= */}
+      <section className="ewo-kpi-grid">
+        <div className="ewo-kpi-card">
+          <span>Total Work Orders</span>
+          <strong>{totalEwo}</strong>
+        </div>
 
-        <SummaryCard
-          label="Pending"
-          value={pending}
-          color="#c17b18"
-        />
+        <div className="ewo-kpi-card">
+          <span>Pending</span>
+          <strong className="status-pending">
+            {pendingEwo}
+          </strong>
+        </div>
 
-        <SummaryCard
-          label="On Progress"
-          value={onProgress}
-          color="#2563eb"
-        />
+        <div className="ewo-kpi-card">
+          <span>On Progress</span>
+          <strong className="status-progress">
+            {onProgressEwo}
+          </strong>
+        </div>
 
-        <SummaryCard
-          label="Done"
-          value={done}
-          color="#2f8f3b"
-        />
+        <div className="ewo-kpi-card">
+          <span>Done</span>
+          <strong className="status-done">
+            {doneEwo}
+          </strong>
+        </div>
       </section>
 
-      <section style={styles.card}>
-        <div style={styles.toolbar}>
+      {/* ================= EWO SAAT INI ================= */}
+      <section className="ewo-section">
+        <div className="section-title">
+          <h2>EWO Saat Ini</h2>
+          <p>Daftar EWO yang masih dalam proses penanganan</p>
+        </div>
+
+        <div className="ewo-toolbar">
           <input
-            value={search}
-            onChange={(event) =>
-              setSearch(event.target.value)
-            }
+            type="text"
             placeholder="Search EWO code, equipment, requestor..."
-            style={styles.search}
+            value={currentSearch}
+            onChange={(event) =>
+              setCurrentSearch(event.target.value)
+            }
           />
 
           <select
@@ -143,116 +153,67 @@ export default function AdminWorkOrders() {
             onChange={(event) =>
               setStatusFilter(event.target.value)
             }
-            style={styles.filter}
           >
-            <option value="All">
-              All Status
-            </option>
-
-            {statusOptions.map((status) => (
-              <option
-                key={status}
-                value={status}
-              >
-                {status}
-              </option>
-            ))}
+            <option value="All Status">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="On Progress">On Progress</option>
           </select>
         </div>
 
-        <div style={styles.tableWrapper}>
-          <table style={styles.table}>
+        <div className="ewo-table-wrapper">
+          <table className="ewo-table">
             <thead>
               <tr>
-                <th style={styles.th}>
-                  EWO Code
-                </th>
-
-                <th style={styles.th}>
-                  Requestor
-                </th>
-
-                <th style={styles.th}>
-                  Equipment
-                </th>
-
-                <th style={styles.th}>
-                  Section
-                </th>
-
-                <th style={styles.th}>
-                  Created
-                </th>
-
-                <th style={styles.th}>
-                  Status
-                </th>
+                <th>EWO Code</th>
+                <th>Requestor</th>
+                <th>Equipment</th>
+                <th>Section</th>
+                <th>Created</th>
+                <th>Status</th>
               </tr>
             </thead>
 
             <tbody>
-              {filteredEwo.map((item) => (
-                <tr key={item.id}>
-                  <td style={styles.td}>
-                    <strong>
-                      {item.ewoCode}
-                    </strong>
-                  </td>
-
-                  <td style={styles.td}>
-                    {item.requestor}
-                  </td>
-
-                  <td style={styles.td}>
-                    {item.equipment}
-                  </td>
-
-                  <td style={styles.td}>
-                    {item.section}
-                  </td>
-
-                  <td style={styles.td}>
-                    {item.createdAt}
-                  </td>
-
-                  <td style={styles.td}>
-                    <select
-                      value={item.status}
-                      onChange={(event) =>
-                        updateStatus(
-                          item.id,
-                          event.target.value as EwoStatus,
-                        )
-                      }
-                      style={{
-                        ...styles.statusSelect,
-                        color: getStatusColor(
-                          item.status,
-                        ),
-                      }}
-                    >
-                      {statusOptions.map(
-                        (status) => (
-                          <option
-                            key={status}
-                            value={status}
-                          >
-                            {status}
-                          </option>
-                        ),
-                      )}
-                    </select>
-                  </td>
-                </tr>
-              ))}
-
-              {filteredEwo.length === 0 && (
+              {currentEwo.length > 0 ? (
+                currentEwo.map((ewo) => (
+                  <tr key={ewo.id}>
+                    <td>
+                      <strong>{ewo.ewoCode}</strong>
+                    </td>
+                    <td>{ewo.requestor}</td>
+                    <td>{ewo.equipment}</td>
+                    <td>{ewo.section}</td>
+                    <td>{ewo.createdAt}</td>
+                    <td>
+                      <select
+                        className={`status-select ${getStatusClass(
+                          ewo.status
+                        )}`}
+                        value={ewo.status}
+                        onChange={(event) =>
+                          handleStatusChange(
+                            ewo.id,
+                            event.target.value as EwoStatus
+                          )
+                        }
+                      >
+                        <option value="Pending">
+                          Pending
+                        </option>
+                        <option value="On Progress">
+                          On Progress
+                        </option>
+                        <option value="Done">
+                          Done
+                        </option>
+                      </select>
+                    </td>
+                  </tr>
+                ))
+              ) : (
                 <tr>
-                  <td
-                    colSpan={6}
-                    style={styles.empty}
-                  >
-                    Tidak ada EWO yang sesuai.
+                  <td colSpan={6} className="empty-row">
+                    Tidak ada EWO aktif.
                   </td>
                 </tr>
               )}
@@ -261,42 +222,53 @@ export default function AdminWorkOrders() {
         </div>
       </section>
 
-      <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>
-          History EWO
-        </h2>
+      {/* ================= HISTORY EWO ================= */}
+      <section className="ewo-section">
+        <div className="section-title">
+          <h2>History EWO</h2>
+          <p>Daftar EWO yang telah selesai ditangani</p>
+        </div>
 
-        <div style={styles.historyList}>
-          {ewoList
-            .filter(
-              (item) => item.status === "Done",
-            )
-            .map((item) => (
-              <div
-                key={item.id}
-                style={styles.historyItem}
-              >
+        <div className="history-toolbar">
+          <input
+            type="text"
+            placeholder="Search history EWO..."
+            value={historySearch}
+            onChange={(event) =>
+              setHistorySearch(event.target.value)
+            }
+          />
+        </div>
+
+        <div className="history-list">
+          {historyEwo.length > 0 ? (
+            historyEwo.map((ewo) => (
+              <div className="history-item" key={ewo.id}>
                 <div>
-                  <strong>
-                    {item.ewoCode}
-                  </strong>
-
-                  <p style={styles.historyText}>
-                    {item.equipment} —{" "}
-                    {item.requestor}
+                  <strong>{ewo.ewoCode}</strong>
+                  <p>
+                    {ewo.equipment} — {ewo.requestor}
                   </p>
+                  <small>
+                    Section {ewo.section} · Dibuat{" "}
+                    {ewo.createdAt}
+                  </small>
                 </div>
 
-                <div style={styles.historyDate}>
-                  {item.completedAt ||
-                    "Belum selesai"}
+                <div className="history-right">
+                  <span className="status-badge status-done">
+                    Done
+                  </span>
+
+                  <span>
+                    {ewo.completedAt ?? "-"}
+                  </span>
                 </div>
               </div>
-            ))}
-
-          {done === 0 && (
-            <p>
-              Belum terdapat EWO yang selesai.
+            ))
+          ) : (
+            <p className="empty-history">
+              Tidak ada history EWO yang sesuai.
             </p>
           )}
         </div>
@@ -305,211 +277,18 @@ export default function AdminWorkOrders() {
   );
 }
 
-function SummaryCard({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: number;
-  color: string;
-}) {
-  return (
-    <div style={styles.summaryCard}>
-      <p style={styles.summaryLabel}>
-        {label}
-      </p>
+function getStatusClass(status: EwoStatus) {
+  switch (status) {
+    case "Pending":
+      return "status-pending";
 
-      <strong
-        style={{
-          ...styles.summaryValue,
-          color,
-        }}
-      >
-        {value}
-      </strong>
-    </div>
-  );
-}
+    case "On Progress":
+      return "status-progress";
 
-function getStatusColor(
-  status: EwoStatus,
-) {
-  if (status === "Done") {
-    return "#2f8f3b";
+    case "Done":
+      return "status-done";
+
+    default:
+      return "";
   }
-
-  if (status === "On Progress") {
-    return "#2563eb";
-  }
-
-  return "#c17b18";
 }
-
-const styles: Record<
-  string,
-  React.CSSProperties
-> = {
-  page: {
-    minHeight: "100vh",
-    background: "#f8f7f5",
-    padding: "28px",
-  },
-
-  header: {
-    background: "#ffffff",
-    borderRadius: "10px",
-    padding: "16px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: "24px",
-  },
-
-  pageTitle: {
-    margin: 0,
-    color: "#751b17",
-    fontSize: "28px",
-  },
-
-  subtitle: {
-    margin: "6px 0 0",
-    color: "#666666",
-  },
-
-  avatar: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "50%",
-    border: "1px solid #dddddd",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#751b17",
-    fontWeight: 700,
-  },
-
-  summaryGrid: {
-    display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "16px",
-    marginBottom: "24px",
-  },
-
-  summaryCard: {
-    background: "#ffffff",
-    border: "1px solid #dddddd",
-    borderRadius: "10px",
-    padding: "20px",
-    textAlign: "center",
-  },
-
-  summaryLabel: {
-    color: "#666666",
-    margin: 0,
-  },
-
-  summaryValue: {
-    display: "block",
-    fontSize: "32px",
-    marginTop: "8px",
-  },
-
-  card: {
-    background: "#ffffff",
-    borderRadius: "10px",
-    padding: "20px",
-    marginBottom: "24px",
-    border: "1px solid #dddddd",
-  },
-
-  toolbar: {
-    display: "flex",
-    gap: "12px",
-    flexWrap: "wrap",
-    marginBottom: "20px",
-  },
-
-  search: {
-    flex: 1,
-    minWidth: "220px",
-    padding: "12px",
-    border: "1px solid #cccccc",
-    borderRadius: "6px",
-  },
-
-  filter: {
-    padding: "12px",
-    border: "1px solid #cccccc",
-    borderRadius: "6px",
-    background: "#ffffff",
-  },
-
-  tableWrapper: {
-    width: "100%",
-    overflowX: "auto",
-  },
-
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    minWidth: "800px",
-  },
-
-  th: {
-    textAlign: "left",
-    padding: "14px 12px",
-    borderBottom: "1px solid #222222",
-    fontSize: "13px",
-    color: "#555555",
-  },
-
-  td: {
-    padding: "16px 12px",
-    borderBottom: "1px solid #eeeeee",
-    fontSize: "14px",
-  },
-
-  statusSelect: {
-    padding: "8px",
-    borderRadius: "6px",
-    border: "1px solid #cccccc",
-    background: "#ffffff",
-    fontWeight: 600,
-  },
-
-  empty: {
-    padding: "30px",
-    textAlign: "center",
-    color: "#777777",
-  },
-
-  sectionTitle: {
-    color: "#751b17",
-    marginTop: 0,
-  },
-
-  historyList: {
-    display: "flex",
-    flexDirection: "column",
-  },
-
-  historyItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: "20px",
-    padding: "14px 0",
-    borderBottom: "1px solid #eeeeee",
-  },
-
-  historyText: {
-    margin: "6px 0 0",
-    color: "#666666",
-  },
-
-  historyDate: {
-    color: "#2f8f3b",
-    fontWeight: 600,
-  },
-};

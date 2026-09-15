@@ -1818,3 +1818,285 @@ tbody tr:nth-child(even) {
     flex-direction: column;
   }
 }
+
+.work-orders-page {
+  width: 100%;
+  min-width: 0;
+  padding: 28px;
+  background: #f7f6f4;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 28px;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: #781b17;
+  font-size: clamp(24px, 2vw, 32px);
+}
+
+.page-header p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 18px;
+}
+
+.profile-initial {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ddd6ce;
+  border-radius: 50%;
+  color: #781b17;
+  font-weight: 700;
+}
+
+/* KPI */
+
+.ewo-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.ewo-kpi-card {
+  padding: 28px 20px;
+  background: white;
+  border: 1px solid #ddd6ce;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.ewo-kpi-card span {
+  display: block;
+  color: #64748b;
+  font-size: 18px;
+}
+
+.ewo-kpi-card strong {
+  display: block;
+  margin-top: 12px;
+  color: #781b17;
+  font-size: 38px;
+}
+
+/* Section */
+
+.ewo-section {
+  margin-bottom: 30px;
+  padding: 24px;
+  background: white;
+  border: 1px solid #ddd6ce;
+  border-radius: 12px;
+}
+
+.section-title h2 {
+  margin: 0;
+  color: #781b17;
+  font-size: 30px;
+}
+
+.section-title p {
+  margin: 6px 0 22px;
+  color: #64748b;
+}
+
+/* Search */
+
+.ewo-toolbar,
+.history-toolbar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ewo-toolbar input,
+.history-toolbar input,
+.ewo-toolbar select {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  font-size: 16px;
+}
+
+.ewo-toolbar input,
+.history-toolbar input {
+  flex: 1;
+}
+
+.ewo-toolbar select {
+  width: 180px;
+}
+
+/* Table */
+
+.ewo-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.ewo-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+}
+
+.ewo-table th,
+.ewo-table td {
+  padding: 20px 14px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.ewo-table th {
+  color: #475569;
+  font-size: 15px;
+}
+
+.ewo-table td {
+  color: #111827;
+}
+
+.ewo-table tbody tr:nth-child(even) {
+  background: #faf9f7;
+}
+
+/* Status */
+
+.status-select {
+  min-width: 140px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status-pending {
+  color: #c47700 !important;
+}
+
+.status-progress {
+  color: #2563eb !important;
+}
+
+.status-done {
+  color: #159447 !important;
+}
+
+.status-select.status-pending {
+  border-color: #d6a000;
+}
+
+.status-select.status-progress {
+  border-color: #2563eb;
+}
+
+.status-select.status-done {
+  border-color: #159447;
+}
+
+.empty-row {
+  padding: 32px !important;
+  text-align: center !important;
+  color: #64748b !important;
+}
+
+/* History */
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.history-item strong {
+  color: #111827;
+  font-size: 20px;
+}
+
+.history-item p {
+  margin: 8px 0;
+  color: #64748b;
+  font-size: 18px;
+}
+
+.history-item small {
+  color: #94a3b8;
+}
+
+.history-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  color: #159447;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: #eaf8ee;
+}
+
+.empty-history {
+  color: #64748b;
+}
+
+/* Responsive */
+
+@media (max-width: 1000px) {
+  .ewo-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .work-orders-page {
+    padding: 16px;
+  }
+
+  .ewo-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ewo-toolbar {
+    flex-direction: column;
+  }
+
+  .ewo-toolbar select {
+    width: 100%;
+  }
+
+  .history-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .history-right {
+    align-items: flex-start;
+  }
+}
