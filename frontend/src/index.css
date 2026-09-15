@@ -1,111 +1,563 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
+  font-family: Inter, Arial, sans-serif;
+  color: #211f1d;
+  background: #f6f5f2;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+* {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
+  min-height: 100%;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+body {
+  overflow-x: hidden;
 }
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
+#root {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
   margin: 0;
+  padding: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+body {
+  background: #f6f5f2;
 }
 
-code {
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #c9a227;
+  outline-offset: 2px;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+/* =====================================================
+   DESKTOP
+   ===================================================== */
+
+#root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  text-align: left;
+}
+
+/* Sidebar */
+aside {
+  width: clamp(190px, 17vw, 248px) !important;
+  min-height: 100vh;
+  flex-shrink: 0;
+}
+
+/* Main content */
+main {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+}
+
+/* Header */
+main header {
+  width: 100% !important;
+  min-width: 0;
+}
+
+/* Filter section */
+main section {
+  min-width: 0;
+}
+
+/* Filter input and dropdown */
+main input,
+main select {
+  max-width: 100%;
+}
+
+/* KPI cards */
+main section:nth-of-type(2) {
+  width: 100%;
+}
+
+/* Tabel */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  vertical-align: middle;
+}
+
+th {
+  font-weight: 700;
+}
+
+td button {
+  white-space: nowrap;
+}
+
+/* =====================================================
+   LAPTOP DAN TABLET BESAR
+   ===================================================== */
+
+@media (max-width: 1200px) {
+  main {
+    padding: 24px 16px !important;
+  }
+
+  main section:nth-of-type(2) {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(190px, 1fr)
+    ) !important;
+  }
+
+  main section:nth-of-type(3),
+  main section:nth-of-type(4) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  main section:nth-of-type(3) > div,
+  main section:nth-of-type(4) > div {
+    width: 100% !important;
+  }
+}
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+
+@media (max-width: 900px) {
+  aside {
+    width: 190px !important;
+    padding: 24px 12px 16px !important;
+  }
+
+  main {
+    padding: 20px 12px !important;
+    gap: 16px !important;
+  }
+
+  main header {
+    padding: 12px !important;
+    flex-wrap: wrap;
+  }
+
+  main header h1 {
+    font-size: 22px !important;
+  }
+
+  main header p {
+    line-height: 1.5;
+  }
+
+  main section:first-of-type {
+    padding: 8px 0 !important;
+  }
+
+  main section:first-of-type > div {
+    width: 100%;
+  }
+
+  main section:first-of-type label {
+    flex: 1 1 180px;
+  }
+
+  main section:first-of-type select {
+    width: 100% !important;
+  }
+
+  main section:first-of-type button {
+    width: 150px !important;
+  }
+
+  main section:nth-of-type(2) {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(180px, 1fr)
+    ) !important;
+  }
+
+  main section:nth-of-type(3),
+  main section:nth-of-type(4) {
+    grid-template-columns: 1fr !important;
+  }
+
+  main section:nth-of-type(4) > div {
+    width: 100% !important;
+  }
+
+  main footer {
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+}
+
+/* =====================================================
+   SMARTPHONE
+   ===================================================== */
+
+@media (max-width: 768px) {
+  #root {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  aside {
+    width: 72px !important;
+    min-width: 72px !important;
+    padding: 20px 8px !important;
+  }
+
+  aside nav button {
+    justify-content: center !important;
+    padding: 10px 4px !important;
+    gap: 0 !important;
+  }
+
+  /*
+    Menyembunyikan teks menu sidebar.
+    Elemen pertama tetap berupa bullet berwarna gold.
+  */
+  aside nav button span:last-child {
+    display: none;
+  }
+
+  aside nav button span:first-child {
+    flex: 0 0 auto !important;
+  }
+
+  /*
+    Menyesuaikan logo CMMS.
+  */
+  aside > div:first-child > div:first-child > div:first-child {
+    font-size: 20px !important;
+    text-align: center;
+  }
+
+  aside > div:first-child > div:first-child > div:last-child {
+    display: none;
+  }
+
+  /*
+    Menyesuaikan profil pengguna pada sidebar.
+  */
+  aside > div:last-child {
+    justify-content: center !important;
+    padding: 8px 4px !important;
+    gap: 0 !important;
+  }
+
+  aside > div:last-child > div:last-child {
+    display: none;
+  }
+
+  main {
+    width: calc(100% - 72px);
+    min-width: 0;
+    padding: 12px !important;
+    gap: 14px !important;
+  }
+
+  main header {
+    padding: 12px !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  main header h1 {
+    font-size: 20px !important;
+    line-height: 1.3;
+  }
+
+  main header p {
+    font-size: 11px !important;
+    line-height: 1.5;
+  }
+
+  /*
+    Input search dibuat lebih kecil pada smartphone.
+  */
+  main header input {
+    width: 150px !important;
+    max-width: 100%;
+  }
+
+  /*
+    Filter disusun vertikal.
+  */
+  main section:first-of-type {
+    padding: 4px 0 !important;
+    align-items: stretch !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  main section:first-of-type > div:first-child {
+    width: 100%;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  main section:first-of-type label {
+    width: 100% !important;
+    flex: 1 1 auto;
+  }
+
+  main section:first-of-type select {
+    width: 100% !important;
+  }
+
+  main section:first-of-type button {
+    width: 100% !important;
+  }
+
+  /*
+    KPI card menjadi satu kolom.
+  */
+  main section:nth-of-type(2) {
+    grid-template-columns: 1fr !important;
+  }
+
+  /*
+    Chart dan Equipment Status menjadi satu kolom.
+  */
+  main section:nth-of-type(3) {
+    grid-template-columns: 1fr !important;
+  }
+
+  /*
+    Work Order dan Compliance menjadi satu kolom.
+  */
+  main section:nth-of-type(4) {
+    grid-template-columns: 1fr !important;
+  }
+
+  main section:nth-of-type(4) > div {
+    width: 100% !important;
+  }
+
+  /*
+    Tabel dapat digeser secara horizontal tanpa merusak layout utama.
+  */
+  main section:nth-of-type(4) table {
+    min-width: 520px;
+  }
+
+  main section:nth-of-type(4) {
+    overflow-x: auto;
+  }
+
+  main footer {
+    padding: 16px !important;
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* =====================================================
+   SMARTPHONE KECIL
+   ===================================================== */
+
+@media (max-width: 480px) {
+  aside {
+    width: 58px !important;
+    min-width: 58px !important;
+    padding: 16px 5px !important;
+  }
+
+  main {
+    width: calc(100% - 58px);
+    padding: 10px !important;
+    gap: 12px !important;
+  }
+
+  main header {
+    padding: 10px !important;
+  }
+
+  main header h1 {
+    font-size: 18px !important;
+  }
+
+  main header p {
+    font-size: 10px !important;
+  }
+
+  main header input {
+    width: 125px !important;
+  }
+
+  main header button {
+    font-size: 20px !important;
+  }
+
+  main section:nth-of-type(2) > div {
+    padding: 12px !important;
+  }
+
+  main section:nth-of-type(2) > div > div:nth-child(2) {
+    font-size: 23px !important;
+  }
+
+  main footer {
+    font-size: 10px !important;
+  }
+}
+
+/* =====================================================
+   PENGATURAN AKSESIBILITAS
+   ===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #f6f5f2;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 36px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-header h1 {
+  margin: 0 0 8px;
+  color: #681f2a;
+  font-size: 28px;
+}
+
+.login-header p {
+  margin: 0;
+  color: #77716d;
+  font-size: 14px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  color: #302b29;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #d8d3ce;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  background: #ffffff;
+}
+
+.form-group input:focus {
+  border-color: #681f2a;
+  box-shadow: 0 0 0 3px rgba(104, 31, 42, 0.1);
+}
+
+.login-button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 8px;
+  background: #681f2a;
+  color: #ffffff;
   font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background: #501620;
+}
+
+.login-error {
+  margin: 0;
+  color: #c0392b;
+  font-size: 13px;
+}
+
+.dummy-account {
+  margin-top: 24px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f4eee9;
+  color: #514944;
+  font-size: 13px;
+}
+
+.dummy-account p {
+  margin: 5px 0 0;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 26px 20px;
+  }
 }
