@@ -1,9 +1,19 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
+from app.core.config import CORS_ALLOWED_ORIGINS
 from app.core.database import engine
 from app.routers import accounts, auth, equipment, ewo_requests, maintenance
 
-app = FastAPI(title="EWO Management API", version="1.0.0")
+app = FastAPI(title="CMMS", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ALLOWED_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "X-Session-Token"],
+)
 
 app.include_router(auth.router)
 app.include_router(accounts.router)

@@ -12,7 +12,7 @@ from app.models.ewo_request import EwoRequest
 from app.schemas.ewo_maintenance import EquipmentHistoryItem, EwoMaintenanceCreate, EwoMaintenanceResponse
 
 router = APIRouter(tags=["maintenance"])
-MAINTENANCE_ROLES = ("teknisi_mtc", "teamleader_mtc", "super_admin")
+MAINTENANCE_ROLES = ("teknisi", "team_leader", "manager", "general_manager", "super_admin")
 
 
 @router.post("/ewo-requests/{ewo_id}/maintenance", response_model=EwoMaintenanceResponse, status_code=201)
@@ -51,8 +51,7 @@ def equipment_history(
     equipment_id: UUID,
     db: Session = Depends(get_db),
     _=Depends(require_roles(
-        "teknisi_mtc", "tim_produksi", "teamleader_mtc", "teamleader_produksi",
-        "manager_produksi", "manager_mtc", "general_manager", "super_admin",
+        "teknisi", "team_leader", "manager", "general_manager", "super_admin",
     )),
 ):
     if not db.query(Equipment).filter(Equipment.id == equipment_id).first():

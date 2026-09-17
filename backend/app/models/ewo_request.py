@@ -15,6 +15,7 @@ class EwoRequest(Base):
     ewo_number = Column(String(30), unique=True, nullable=False)
     requestor_name = Column(String(150), nullable=False)
     department = Column(String(100), nullable=False)
+    section = Column(String(10), nullable=False)
     equipment_id = Column(UUID(as_uuid=True), ForeignKey("equipment.id"), nullable=False)
     shift = Column(String(50), nullable=False)
     team_leader_name = Column(String(150), nullable=False)

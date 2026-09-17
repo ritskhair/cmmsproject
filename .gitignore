@@ -1,0 +1,26 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Frontend build output and dependencies
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Tooling and editor files
+.pytest_cache/
+.mypy_cache/
+.coverage
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store

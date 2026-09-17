@@ -1,39 +1,20 @@
 import {
+  useEffect,
   useState,
   type FormEvent,
 } from "react";
 
 import { useNavigate } from "react-router-dom";
-
-const equipmentBySection: Record<string, string[]> = {
-  K1: [
-    "Log Chain Conveyor Debarker 1",
-    "Log Shaft Debarker 1",
-    "Skin Picking Conveyor 1",
-    "Infeed Log Chipper #1",
-    "Infeed Log Chipper #2",
-    "Log Chipper 1",
-    "Output Log Chipper 1",
-  ],
-  K2: [
-    "Pellet Mill 1",
-    "Hammer Mill 1",
-    "Rotary Dryer 1",
-  ],
-  K3: [
-    "Packing Machine 1",
-    "Packing Machine 2",
-  ],
-};
+import { apiRequest, type Equipment } from "../../utils/api";
 
 export default function OperatorEwoForm() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
   const [requestor, setRequestor] = useState("");
   const [department, setDepartment] = useState("");
-  const [section, setSection] = useState("K1");
-  const [equipment, setEquipment] = useState("");
+  const [section, setSection] = useState<"1" | "2" | "3" | "4" | "5">("1");
+  const [equipmentId, setEquipmentId] = useState("");
+  const [equipmentOptions, setEquipmentOptions] = useState<Equipment[]>([]);
   const [teamLeader, setTeamLeader] = useState("");
   const [shift, setShift] = useState("");
   const [failureType, setFailureType] = useState("");
@@ -42,25 +23,45 @@ export default function OperatorEwoForm() {
 
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [loadingEquipment, setLoadingEquipment] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setLoadingEquipment(true);
+    setEquipmentId("");
+    apiRequest<Equipment[]>(`/equipment/operator/equipment?section=${section}`)
+      .then((equipment) => {
+        if (active) setEquipmentOptions(equipment);
+      })
+      .catch((requestError) => {
+        if (active) setError(requestError instanceof Error ? requestError.message : "Equipment gagal dimuat.");
+      })
+      .finally(() => {
+        if (active) setLoadingEquipment(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [section]);
 
   const handleSectionChange = (
     nextSection: string,
   ) => {
-    setSection(nextSection);
-    setEquipment("");
+    if (!/^[1-5]$/.test(nextSection)) return;
+    setSection(nextSection as "1" | "2" | "3" | "4" | "5");
+    setEquipmentId("");
   };
 
-  const handleSubmit = (
+  const handleSubmit = async (
     event: FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
 
     if (
-      !email ||
       !requestor ||
       !department ||
       !section ||
-      !equipment ||
+      !equipmentId ||
       !teamLeader ||
       !shift ||
       !failureType ||
@@ -73,46 +74,26 @@ export default function OperatorEwoForm() {
       return;
     }
 
-    const newEwo = {
-      id: Date.now().toString(),
-      ewoCode: `EWO-2026-${Date.now()
-        .toString()
-        .slice(-4)}`,
-      email,
-      requestor,
-      department,
-      section,
-      equipment,
-      teamLeader,
-      shift,
-      failureType,
-      taskList,
-      specialNote,
-      status: "Pending",
-      createdAt: new Date().toLocaleDateString(
-        "en-GB",
-        {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        },
-      ),
-    };
-
-    const existingData = JSON.parse(
-      localStorage.getItem("cmmsEwoData") || "[]",
-    );
-
-    localStorage.setItem(
-      "cmmsEwoData",
-      JSON.stringify([
-        ...existingData,
-        newEwo,
-      ]),
-    );
-
-    setError("");
-    setSubmitted(true);
+    try {
+      await apiRequest("/ewo-requests", {
+        method: "POST",
+        body: JSON.stringify({
+          section,
+          requestor_name: requestor,
+          department,
+          equipment_id: equipmentId,
+          shift,
+          team_leader_name: teamLeader,
+          failure_type: failureType === "Total" ? "total" : "partial",
+          task_list: taskList,
+          special_note: specialNote || null,
+        }),
+      });
+      setError("");
+      setSubmitted(true);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "EWO gagal dikirim.");
+    }
   };
 
   if (submitted) {
@@ -140,9 +121,6 @@ export default function OperatorEwoForm() {
       </div>
     );
   }
-
-  const equipmentOptions =
-    equipmentBySection[section] || [];
 
   return (
     <div style={styles.page}>
@@ -179,20 +157,6 @@ export default function OperatorEwoForm() {
             <h2 style={styles.sectionTitle}>
               Identitas Requestor
             </h2>
-
-            <label style={styles.label}>
-              Email *
-            </label>
-
-            <input
-              type="email"
-              value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
-              placeholder="name@company.com"
-              style={styles.input}
-            />
 
             <label style={styles.label}>
               Nama Requestor *
@@ -254,11 +218,11 @@ export default function OperatorEwoForm() {
               }
               style={styles.input}
             >
-              <option value="Section 1">Section 1</option>
-              <option value="Section 2">Section 2</option>
-              <option value="Section 3">Section 3</option>
-              <option value="Section 4">Section 4</option>
-              <option value="Section 5">Section 5</option>
+              <option value="1">Section 1</option>
+              <option value="2">Section 2</option>
+              <option value="3">Section 3</option>
+              <option value="4">Section 4</option>
+              <option value="5">Section 5</option>
             </select>
 
             <label style={styles.label}>
@@ -266,22 +230,22 @@ export default function OperatorEwoForm() {
             </label>
 
             <select
-              value={equipment}
+              value={equipmentId}
               onChange={(event) =>
-                setEquipment(event.target.value)
+                setEquipmentId(event.target.value)
               }
               style={styles.input}
             >
               <option value="">
-                Pilih equipment
+                {loadingEquipment ? "Memuat equipment..." : "Pilih equipment"}
               </option>
 
               {equipmentOptions.map((item) => (
                 <option
-                  key={item}
-                  value={item}
+                  key={item.id}
+                  value={item.id}
                 >
-                  {item}
+                  {item.asset_id} - {item.name}
                 </option>
               ))}
             </select>

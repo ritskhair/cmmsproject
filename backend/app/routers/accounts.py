@@ -19,7 +19,13 @@ def list_accounts(db: Session = Depends(get_db), _=Depends(require_roles("super_
 
 @router.post("", response_model=AccountResponse, status_code=201)
 def create_account(payload: AccountCreate, db: Session = Depends(get_db), _=Depends(require_roles("super_admin"))):
-    account = Account(username=payload.username, password=hash_password(payload.password), role=payload.role)
+    account = Account(
+        username=payload.username,
+        password=hash_password(payload.password),
+        department=payload.department,
+        position=payload.position,
+        role=payload.role,
+    )
     db.add(account)
     try:
         db.commit()

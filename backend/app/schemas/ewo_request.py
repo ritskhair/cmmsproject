@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import Literal
 from uuid import UUID
 
@@ -9,7 +10,16 @@ EwoStatus = Literal["pending", "in_progress", "completed"]
 FailureType = Literal["total", "partial"]
 
 
+class Section(str, Enum):
+    section_1 = "1"
+    section_2 = "2"
+    section_3 = "3"
+    section_4 = "4"
+    section_5 = "5"
+
+
 class EwoRequestCreate(BaseModel):
+    section: Section
     requestor_name: str
     department: str
     equipment_id: UUID
@@ -21,6 +31,7 @@ class EwoRequestCreate(BaseModel):
 
 
 class EwoRequestUpdate(BaseModel):
+    section: Section | None = None
     requestor_name: str | None = None
     department: str | None = None
     equipment_id: UUID | None = None
@@ -36,6 +47,7 @@ class EwoRequestResponse(BaseModel):
 
     id: UUID
     ewo_number: str
+    section: Section
     requestor_name: str
     department: str
     equipment_id: UUID

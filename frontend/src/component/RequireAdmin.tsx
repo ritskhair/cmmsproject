@@ -8,7 +8,7 @@ export default function RequireAdmin() {
     return <Navigate to="/login" replace />;
   }
 
-  if (session.role !== "admin") {
+  if (session.role !== "admin" || session.backendRole === "operator") {
     return <Navigate to="/work-orders" replace />;
   }
 

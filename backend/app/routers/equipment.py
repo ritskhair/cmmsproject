@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.security import get_current_account
+from app.core.security import get_current_account, require_roles
 from app.models.equipment import Equipment
 from app.schemas.equipment import EquipmentCreate, EquipmentResponse, EquipmentStatus, EquipmentUpdate
 
@@ -17,7 +17,7 @@ def list_equipment(
     status: EquipmentStatus | None = Query(default=None),
     section: str | None = Query(default=None),
     db: Session = Depends(get_db),
-    _=Depends(get_current_account),
+    _=Depends(require_roles("teknisi", "team_leader", "manager", "general_manager", "super_admin")),
 ):
     query = db.query(Equipment)
     if status:
@@ -28,7 +28,7 @@ def list_equipment(
 
 
 @router.post("", response_model=EquipmentResponse, status_code=201)
-def create_equipment(payload: EquipmentCreate, db: Session = Depends(get_db), _=Depends(get_current_account)):
+def create_equipment(payload: EquipmentCreate, db: Session = Depends(get_db), _=Depends(require_roles("teknisi", "team_leader", "manager", "general_manager", "super_admin"))):
     equipment = Equipment(**payload.model_dump())
     db.add(equipment)
     try:
@@ -40,8 +40,17 @@ def create_equipment(payload: EquipmentCreate, db: Session = Depends(get_db), _=
     return equipment
 
 
+@router.get("/operator/equipment", response_model=list[EquipmentResponse])
+def operator_equipment_options(
+    section: str = Query(..., pattern="^[1-5]$"),
+    db: Session = Depends(get_db),
+    _=Depends(require_roles("operator")),
+):
+    return db.query(Equipment).filter(Equipment.section == section).order_by(Equipment.asset_id).all()
+
+
 @router.get("/{equipment_id}", response_model=EquipmentResponse)
-def get_equipment(equipment_id: UUID, db: Session = Depends(get_db), _=Depends(get_current_account)):
+def get_equipment(equipment_id: UUID, db: Session = Depends(get_db), _=Depends(require_roles("teknisi", "team_leader", "manager", "general_manager", "super_admin"))):
     equipment = db.query(Equipment).filter(Equipment.id == equipment_id).first()
     if not equipment:
         raise HTTPException(status_code=404, detail="Equipment not found")
@@ -49,7 +58,7 @@ def get_equipment(equipment_id: UUID, db: Session = Depends(get_db), _=Depends(g
 
 
 @router.patch("/{equipment_id}", response_model=EquipmentResponse)
-def update_equipment(equipment_id: UUID, payload: EquipmentUpdate, db: Session = Depends(get_db), _=Depends(get_current_account)):
+def update_equipment(equipment_id: UUID, payload: EquipmentUpdate, db: Session = Depends(get_db), _=Depends(require_roles("teknisi", "team_leader", "manager", "general_manager", "super_admin"))):
     equipment = db.query(Equipment).filter(Equipment.id == equipment_id).first()
     if not equipment:
         raise HTTPException(status_code=404, detail="Equipment not found")

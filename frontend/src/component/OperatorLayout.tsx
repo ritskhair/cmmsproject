@@ -1,12 +1,17 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { clearAuthSession } from "../utils/auth";
+import { apiRequest } from "../utils/api";
 
 export default function OperatorLayout() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    clearAuthSession();
-    navigate("/login", { replace: true });
+  const handleLogout = async () => {
+    try {
+      await apiRequest<void>("/auth/logout", { method: "POST" });
+    } finally {
+      clearAuthSession();
+      navigate("/login", { replace: true });
+    }
   };
 
   return (

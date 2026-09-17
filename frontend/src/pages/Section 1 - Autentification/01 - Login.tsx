@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {saveAuthSession,} from "../../utils/auth";
+import { apiRequest, type AccountLoginResponse, type OperatorLoginResponse } from "../../utils/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,50 +20,43 @@ export default function Login() {
     }
   }, []);
 
-  const handleSignIn = (
+  const handleSignIn = async (
   event: React.FormEvent<HTMLFormElement>
 ) => {
   event.preventDefault();
+  setError("");
 
-  const dummyEmail = "admin@cmms.com";
-  const dummyPassword = "admin123";
-
-  if (
-    email === dummyEmail &&
-    password === dummyPassword
-  ) {
+  try {
+    const result = await apiRequest<AccountLoginResponse>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username: email, password }),
+    });
     setError("");
-
-    saveAuthSession("admin", email);
+    saveAuthSession("admin", email, result.role, result.token);
 
     setShowSuccess(true);
 
     setTimeout(() => {
       navigate("/dashboard");
     }, 1500);
-  } else {
-    setError("Email atau password salah.");
+  } catch (requestError) {
+    setError(requestError instanceof Error ? requestError.message : "Login gagal.");
   }
 };
 
-  const showLoginSuccess = (path: string) => {
-    setShowSuccess(true);
-
-    setTimeout(() => {
-      navigate(path);
-    }, 1500);
-  };
-
-  const handleOperatorLogin = () => {
+  const handleOperatorLogin = async () => {
     setError("");
 
-    saveAuthSession("operator", "operator@cmms.com");
-
-    setShowSuccess(true);
-
-    setTimeout(() => {
-      navigate("/operator/work-orders");
-    }, 1500);
+    try {
+      const result = await apiRequest<OperatorLoginResponse>("/auth/operator", {
+        method: "POST",
+      });
+      saveAuthSession("operator", "operator", result.role, result.token);
+      setShowSuccess(true);
+      setTimeout(() => navigate("/operator/work-orders"), 1500);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Login operator gagal.");
+    }
   };
 
   /*const handleForgotPassword = () => {
@@ -110,14 +104,14 @@ export default function Login() {
             </div>
 
             <form onSubmit={handleSignIn} className="login-form">
-              {/* Email */}
+              {/* Username */}
               <div className="input-group">
-                <label htmlFor="email">Email address</label>
+                <label htmlFor="email">Username</label>
 
                 <input
                   id="email"
-                  type="email"
-                  placeholder="name@company.com"
+                  type="text"
+                  placeholder="Username"
                   value={email}
                   onChange={(event) => {
                     setEmail(event.target.value);
@@ -194,13 +188,6 @@ export default function Login() {
             >
               New to CMMS?&nbsp; Create an account
             </button>*/}
-
-            {/* Akun dummy */}
-            <div className="dummy-account">
-              <strong>Akun Dummy</strong>
-              <span>Email: admin@cmms.com</span>
-              <span>Password: admin123</span>
-            </div>
 
             {/* Footer */}
             <p className="login-footer">

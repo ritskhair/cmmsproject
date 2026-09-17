@@ -14,4 +14,6 @@ class Account(Base):
     username = Column(String(100), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     role = Column(String(30), nullable=False)
+    department = Column(String(100), nullable=True)
+    position = Column(String(100), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

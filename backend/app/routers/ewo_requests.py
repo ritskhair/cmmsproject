@@ -6,13 +6,15 @@ from sqlalchemy import func, text
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.security import get_current_account, require_roles
+from app.core.security import require_roles
 from app.models.equipment import Equipment
 from app.models.ewo_request import EwoRequest
 from app.schemas.ewo_request import EwoRequestCreate, EwoRequestResponse, EwoRequestUpdate, EwoStatus
 
 router = APIRouter(prefix="/ewo-requests", tags=["ewo-requests"])
-STATUS_ROLES = ("teknisi_mtc", "teamleader_mtc", "super_admin")
+STATUS_ROLES = ("teknisi", "team_leader", "manager", "general_manager", "super_admin")
+READ_ROLES = STATUS_ROLES
+CREATE_ROLES = (*READ_ROLES, "operator")
 
 
 def next_ewo_number(db: Session) -> str:
@@ -23,15 +25,15 @@ def next_ewo_number(db: Session) -> str:
 
 
 @router.get("", response_model=list[EwoRequestResponse])
-def list_ewo_requests(db: Session = Depends(get_db), _=Depends(get_current_account)):
+def list_ewo_requests(db: Session = Depends(get_db), _=Depends(require_roles(*READ_ROLES))):
     return db.query(EwoRequest).order_by(EwoRequest.created_at.desc()).all()
 
 
 @router.post("", response_model=EwoRequestResponse, status_code=201)
-def create_ewo_request(payload: EwoRequestCreate, db: Session = Depends(get_db), _=Depends(get_current_account)):
-    equipment = db.query(Equipment).filter(Equipment.id == payload.equipment_id).first()
+def create_ewo_request(payload: EwoRequestCreate, db: Session = Depends(get_db), _=Depends(require_roles(*CREATE_ROLES))):
+    equipment = db.query(Equipment).filter(Equipment.id == payload.equipment_id, Equipment.section == payload.section.value).first()
     if not equipment:
-        raise HTTPException(status_code=404, detail="Equipment not found")
+        raise HTTPException(status_code=404, detail="Equipment not found in selected section")
     ewo = EwoRequest(ewo_number=next_ewo_number(db), **payload.model_dump())
     db.add(ewo)
     db.commit()
@@ -40,7 +42,7 @@ def create_ewo_request(payload: EwoRequestCreate, db: Session = Depends(get_db),
 
 
 @router.get("/{ewo_id}", response_model=EwoRequestResponse)
-def get_ewo_request(ewo_id: UUID, db: Session = Depends(get_db), _=Depends(get_current_account)):
+def get_ewo_request(ewo_id: UUID, db: Session = Depends(get_db), _=Depends(require_roles(*READ_ROLES))):
     ewo = db.query(EwoRequest).filter(EwoRequest.id == ewo_id).first()
     if not ewo:
         raise HTTPException(status_code=404, detail="EWO request not found")
@@ -48,13 +50,17 @@ def get_ewo_request(ewo_id: UUID, db: Session = Depends(get_db), _=Depends(get_c
 
 
 @router.patch("/{ewo_id}", response_model=EwoRequestResponse)
-def update_ewo_request(ewo_id: UUID, payload: EwoRequestUpdate, db: Session = Depends(get_db), _=Depends(get_current_account)):
+def update_ewo_request(ewo_id: UUID, payload: EwoRequestUpdate, db: Session = Depends(get_db), _=Depends(require_roles(*READ_ROLES))):
     ewo = db.query(EwoRequest).filter(EwoRequest.id == ewo_id).first()
     if not ewo:
         raise HTTPException(status_code=404, detail="EWO request not found")
     values = payload.model_dump(exclude_unset=True)
-    if "equipment_id" in values and not db.query(Equipment).filter(Equipment.id == values["equipment_id"]).first():
-        raise HTTPException(status_code=404, detail="Equipment not found")
+    if "equipment_id" in values or "section" in values:
+        equipment_id = values.get("equipment_id", ewo.equipment_id)
+        section = values.get("section", ewo.section)
+        section = section.value if hasattr(section, "value") else section
+        if not db.query(Equipment).filter(Equipment.id == equipment_id, Equipment.section == section).first():
+            raise HTTPException(status_code=404, detail="Equipment not found in selected section")
     for key, value in values.items():
         setattr(ewo, key, value)
     db.commit()

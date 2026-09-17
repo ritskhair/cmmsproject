@@ -1,188 +1,49 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { equipmentData } from "../../datadummy/EquipmentData";
+import { apiRequest, type Equipment } from "../../utils/api";
+
+type HistoryItem = {
+  id: string;
+  ewo_number: string;
+  equipment_id: string;
+  code_approval: string;
+  start_time: string;
+  end_time: string;
+  condition_after_repair: string;
+  created_at: string;
+};
 
 export default function EquipmentDetail() {
   const { equipmentId } = useParams<{ equipmentId: string }>();
+  const [equipment, setEquipment] = useState<Equipment | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [error, setError] = useState("");
 
-  const equipment = equipmentData.find(
-    (item) => item.id === equipmentId
-  );
+  useEffect(() => {
+    if (!equipmentId) return;
+    Promise.all([
+      apiRequest<Equipment>(`/equipment/${equipmentId}`),
+      apiRequest<HistoryItem[]>(`/equipment/${equipmentId}/history`),
+    ]).then(([equipmentResult, historyResult]) => {
+      setEquipment(equipmentResult);
+      setHistory(historyResult);
+    }).catch((requestError) => {
+      setError(requestError instanceof Error ? requestError.message : "Detail equipment gagal dimuat.");
+    });
+  }, [equipmentId]);
 
-  if (!equipment) {
-    return (
-      <div className="page-container">
-        <h1>Equipment tidak ditemukan</h1>
-
-        <p>
-          Data equipment dengan ID{" "}
-          <strong>{equipmentId}</strong> tidak tersedia.
-        </p>
-
-        <Link to="/equipment" className="back-link">
-          ← Kembali ke List Equipment
-        </Link>
-      </div>
-    );
-  }
+  if (error) return <div className="page-container"><p className="login-error">{error}</p><Link to="/equipment" className="back-link">Kembali ke Equipment</Link></div>;
+  if (!equipment) return <div className="page-container"><p>Memuat equipment...</p></div>;
 
   return (
     <div className="page-container">
-      {/* Header halaman */}
-      <header className="page-header">
-        <h1>Equipment</h1>
-
-        <div className="header-profile">SA</div>
-      </header>
-
-      <p className="page-description">
-        Equipment detail and maintenance history
-      </p>
-
-      {/* Header detail equipment */}
-      <section className="equipment-detail-header">
-        <div className="equipment-title-area">
-          <h2>
-            {equipment.id} | {equipment.name}
-          </h2>
-
-          <span className="status-badge">
-            {equipment.status}
-          </span>
-
-          <span>
-            {equipment.area}
-          </span>
-
-          <span>
-            Criticality {equipment.criticality}
-          </span>
-        </div>
-
-        <div className="detail-actions">
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={() =>
-              alert(
-                `Edit ${equipment.id} masih berupa simulasi frontend.`
-              )
-            }
-          >
-            Edit Equipment
-          </button>
-
-          <button
-            type="button"
-            className="primary-button"
-            onClick={() =>
-              alert(
-                `Create WO untuk ${equipment.id} masih berupa simulasi frontend.`
-              )
-            }
-          >
-            Create WO
-          </button>
-        </div>
-      </section>
-
-      {/* Informasi equipment */}
-      <section className="information-grid">
-        <div className="information-card">
-          <h3>Asset Information</h3>
-
-          <p>
-            <strong>Manufacturer:</strong>{" "}
-            {equipment.manufacturer}
-          </p>
-
-          <p>
-            <strong>Model:</strong> {equipment.model}
-          </p>
-
-          <p>
-            <strong>Capacity:</strong> {equipment.capacity}
-          </p>
-
-          <p>
-            <strong>Installed:</strong> {equipment.installed}
-          </p>
-
-          <p>
-            <strong>Location:</strong> {equipment.location}
-          </p>
-        </div>
-
-        <div className="information-card">
-          <h3>Maintenance Snapshot</h3>
-
-          <p>
-            <strong>MTBF:</strong> {equipment.mtbf}
-          </p>
-
-          <p>
-            <strong>MTTR:</strong> {equipment.mttr}
-          </p>
-
-          <p>
-            <strong>Downtime YTD:</strong>{" "}
-            {equipment.downtimeYTD}
-          </p>
-
-          <p>
-            <strong>Failure count:</strong>{" "}
-            {equipment.failureCount}
-          </p>
-
-          <p>
-            <strong>Next PM:</strong> {equipment.nextPM}
-          </p>
-        </div>
-      </section>
-
-      {/* Maintenance history */}
-      <section className="history-section">
-        <h2>Maintenance History</h2>
-
-        <div className="table-card">
-          <div className="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Event</th>
-                  <th>Type</th>
-                  <th>Technician</th>
-                  <th>Status</th>
-                  <th>Downtime</th>
-                  <th>WO</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {equipment.maintenanceHistory.map((history) => (
-                  <tr key={history.wo}>
-                    <td className="equipment-link">
-                      {history.date}
-                    </td>
-
-                    <td>{history.event}</td>
-                    <td>{history.type}</td>
-                    <td>{history.technician}</td>
-                    <td>{history.status}</td>
-                    <td>{history.downtime}</td>
-                    <td>{history.wo}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <Link to="/equipment" className="back-link">
-        ← Kembali ke List Equipment
-      </Link>
+      <header className="page-header"><h1>Equipment</h1><div className="header-profile">SA</div></header>
+      <p className="page-description">Equipment detail and maintenance history</p>
+      <section className="equipment-detail-header"><div className="equipment-title-area"><h2>{equipment.asset_id} | {equipment.name}</h2><span className="status-badge">{equipment.status}</span><span>Section {equipment.section}</span><span>{equipment.type}</span></div></section>
+      <section className="information-grid"><div className="information-card"><h3>Asset Information</h3><p><strong>Asset ID:</strong> {equipment.asset_id}</p><p><strong>Name:</strong> {equipment.name}</p><p><strong>Type:</strong> {equipment.type}</p><p><strong>Section:</strong> {equipment.section}</p></div><div className="information-card"><h3>Maintenance Snapshot</h3><p><strong>Last PM:</strong> {equipment.last_pm ? new Date(equipment.last_pm).toLocaleString() : "-"}</p><p><strong>Status:</strong> {equipment.status}</p></div></section>
+  <section className="history-section"><h2>Maintenance History</h2><div className="table-card"><div className="table-scroll"><table><thead><tr><th>EWO</th><th>Approval</th><th>Start</th><th>End</th><th>Condition After Repair</th></tr></thead><tbody>{history.map((item) => <tr key={item.id}><td>{item.ewo_number}</td><td>{item.code_approval}</td><td>{new Date(item.start_time).toLocaleString()}</td><td>{new Date(item.end_time).toLocaleString()}</td><td>{item.condition_after_repair}</td></tr>)}</tbody></table></div>{history.length === 0 && <p className="empty-state">Belum ada histori maintenance.</p>}</div></section>
+  <Link to="/equipment" className="back-link">Kembali ke List Equipment</Link>
     </div>
   );
 }
