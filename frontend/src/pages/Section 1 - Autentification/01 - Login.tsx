@@ -45,13 +45,6 @@ export default function Login() {
   }
 };
 
-  const showLoginSuccess = (path: string) => {
-    setShowSuccess(true);
-
-    setTimeout(() => {
-      navigate(path);
-    }, 1500);
-  };
 
   const handleOperatorLogin = () => {
     setError("");
@@ -64,14 +57,6 @@ export default function Login() {
       navigate("/operator/work-orders");
     }, 1500);
   };
-
-  /*const handleForgotPassword = () => {
-    alert("Fitur reset password belum tersedia.");
-  };*/
-
-  /*const handleCreateAccount = () => {
-    alert("Fitur pembuatan akun belum tersedia.");
-  };*/
 
   return (
     <main className="login-page">
