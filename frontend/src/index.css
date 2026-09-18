@@ -527,6 +527,7 @@ Form
   font-size: 12px;
   font-weight: 700;
 }
+.input-group input[type="text"],
 .input-group input[type="email"],
 .input-group input[type="password"] {
   width: 100%;

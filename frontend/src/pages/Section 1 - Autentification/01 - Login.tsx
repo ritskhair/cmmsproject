@@ -44,12 +44,7 @@ export default function Login() {
   }
 };
 
-<<<<<<< HEAD
   const handleOperatorLogin = async () => {
-=======
-
-  const handleOperatorLogin = () => {
->>>>>>> origin/main
     setError("");
 
     try {
