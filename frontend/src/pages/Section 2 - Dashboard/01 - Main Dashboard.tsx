@@ -15,21 +15,21 @@ const initialWorkOrders: WorkOrder[] = [
     machine: "Pellet Mill 01",
     requestor: "Tutur",
     priority: "Critical",
-    section: "K1",
+    section: "Section 1",
   },
   {
     code: "WO-2026-082",
     machine: "Rotary Dryer",
     requestor: "Nastain",
     priority: "High",
-    section: "K2",
+    section: "Section 2",
   },
   {
     code: "WO-2026-083",
     machine: "WHM 02",
     requestor: "Heri",
     priority: "Medium",
-    section: "K3",
+    section: "Section 3",
   },
 ];
 
@@ -113,43 +113,9 @@ export default function MaintenanceDashboard() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        width: "100%",
-        background: colors.background,
-        display: "flex",
-        alignItems: "stretch",
-        color: colors.text,
-        fontFamily: "Inter, Arial, sans-serif",
-      }}
-    >
-
-      {/* MAIN CONTENT */}
-      <main
-        style={{
-          flex: 1,
-          minWidth: 0,
-          width: "100%",
-          minHeight: "100vh",
-          padding: "28px 10px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "20px",
-        }}
-      >
+  <div className="main-dashboard">
         {/* HEADER */}
-        <header
-          style={{
-            background: "white",
-            borderRadius: "8px",
-            padding: "10px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "16px",
-          }}
-        >
+        <header className="dashboard-header">
           <div>
             <h1
               style={{
@@ -169,7 +135,7 @@ export default function MaintenanceDashboard() {
                 fontSize: "12px",
               }}
             >
-              Good morning, Syamsabillah. Here is today’s maintenance overview.
+              Good morning, ADMIN. Here is today’s maintenance overview.
             </p>
           </div>
 
@@ -229,127 +195,56 @@ export default function MaintenanceDashboard() {
                 fontWeight: 700,
               }}
             >
-              SA
+              ADM
             </div>
           </div>
         </header>
 
         {/* FILTERS */}
-        <section
-          style={{
-            padding: "10px 20px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            gap: "20px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              gap: "10px",
-              flexWrap: "wrap",
-              flex: 1,
-              minWidth: 0,
-            }}
-          >
-            <label
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "7px",
-                color: "#4A4745",
-                fontSize: "11px",
-                fontWeight: 700,
-              }}
-            >
-              Period
+        <section className="dashboard-filters">
+          <div className="filter-fields">
+            <label className="filter-field">
+                Period
 
-              <select
-                value={period}
-                onChange={(event) => setPeriod(event.target.value)}
-                style={{
-                  width: "clamp(180px, 25vw, 240px)",
-                  height: "44px",
-                  padding: "0 12px",
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: "10px",
-                  background: "white",
-                  color: colors.text,
-                  fontSize: "13px",
-                }}
-              >
-                <option value="29 Aug 2026">29 Aug 2026</option>
-                <option value="28 Aug 2026">28 Aug 2026</option>
-                <option value="27 Aug 2026">27 Aug 2026</option>
-                <option value="26 Aug 2026">26 Aug 2026</option>
-              </select>
-            </label>
+                <select
+                  value={period}
+                  onChange={(event) => setPeriod(event.target.value)}
+                >
+                  <option value="29 Aug 2026">29 Aug 2026</option>
+                  <option value="28 Aug 2026">28 Aug 2026</option>
+                  <option value="27 Aug 2026">27 Aug 2026</option>
+                  <option value="26 Aug 2026">26 Aug 2026</option>
+                </select>
+              </label>
 
-            <label
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "7px",
-                color: "#4A4745",
-                fontSize: "11px",
-                fontWeight: 700,
-              }}
-            >
+            <label className="filter-field">
               Focus Section
 
               <select
                 value={focusSection}
                 onChange={(event) => setFocusSection(event.target.value)}
-                style={{
-                  width: "240px",
-                  height: "44px",
-                  padding: "0 12px",
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: "10px",
-                  background: "white",
-                  color: colors.text,
-                  fontSize: "13px",
-                }}
               >
                 <option value="All Section">All Section</option>
-                <option value="K1">K1</option>
-                <option value="K2">K2</option>
-                <option value="K3">K3</option>
-                <option value="K4">K4</option>
+                <option value="Section 1">Section 1</option>
+                <option value="Section 2">Section 2</option>
+                <option value="Section 3">Section 3</option>
+                <option value="Section 4">Section 4</option>
+                <option value="Section 5">Section 5</option>
               </select>
             </label>
           </div>
 
           <button
             type="button"
+            className="reset-button"
             onClick={handleReset}
-            style={{
-              width: "180px",
-              minWidth: "140px",
-              height: "48px",
-              border: `1px solid ${colors.gold}`,
-              borderRadius: "10px",
-              background: "white",
-              color: colors.maroon,
-              fontSize: "14px",
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
           >
             Reset
           </button>
         </section>
 
         {/* KPI CARDS */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-            gap: "12px",
-          }}
-        >
+        <section className="dashboard-kpi-grid">
           {[
             ["MTTR", "139.3 min", "↓ 8.2%", "vs last month"],
             ["Total Failure", "113", "↓ 12.5%", "incidents"],
@@ -357,18 +252,7 @@ export default function MaintenanceDashboard() {
             ["PM Compliance", "94.2%", "↑ 3.4%", "target 95%"],
             ["Open Work Orders", "24", "6 urgent", "active backlog"],
           ].map(([title, value, change, description]) => (
-            <div
-              key={title}
-              style={{
-                minWidth: 0,
-                minHeight: "112px",
-                padding: "16px",
-                background: "white",
-                border: `1px solid ${colors.border}`,
-                borderRadius: "12px",
-                boxShadow: "2px 3px 4px rgba(0, 0, 0, 0.12)",
-              }}
-            >
+            <div className="dashboard-kpi-card">
               <div
                 style={{
                   color: colors.secondary,
@@ -420,15 +304,7 @@ export default function MaintenanceDashboard() {
         </section>
 
         {/* CHART AND EQUIPMENT STATUS */}
-        <section
-        style={{
-            width: "100%",
-            display: "grid",
-            gridTemplateColumns:
-            "minmax(0, 2fr) minmax(260px, 1fr)",
-            gap: "16px",
-        }}
-        >
+        <section className="dashboard-chart-grid">
           {/* FAILURE PARETO */}
           <div
             style={{
@@ -574,13 +450,7 @@ export default function MaintenanceDashboard() {
         </section>
 
         {/* WORK ORDERS AND COMPLIANCE */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 1.2fr) minmax(280px, 1fr)",
-            gap: "16px",
-          }}
-        >
+        <section className="dashboard-bottom-grid">
           {/* OPEN WORK ORDERS */}
           <div
             style={{
@@ -794,7 +664,7 @@ export default function MaintenanceDashboard() {
 
           <span>CMMS</span>
         </footer>
-      </main>
+      
 
       {/* EDIT MODAL */}
       {isEditModalOpen && selectedWorkOrder && (

@@ -31,17 +31,18 @@ export default function App() {
           </Route>
         </Route>
 
-         {/* Halaman admin dengan sidebar */}
+        {/* Halaman admin dengan sidebar */}
         <Route element={<RequireAdmin />}>
-          <Route element={<RequireAdmin />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<MaintenanceDashboard />} />
             <Route path="/equipment" element={<EquipmentList />} />
-            <Route path="/equipment/:equipmentId" element={<EquipmentDetail />} />
+            <Route
+              path="/equipment/:equipmentId"
+              element={<EquipmentDetail />}
+            />
             <Route path="/work-orders" element={<WorkOrders />} />
             <Route path="/user-management" element={<UserManagement />} />
           </Route>
-        </Route>
         </Route>
 
         {/* Route tidak ditemukan */}

@@ -20,6 +20,7 @@ body {
 
 body {
   overflow-x: hidden;
+  font-family: Arial, sans-serif;
 }
 #root {
   width: 100%;
@@ -61,387 +62,315 @@ button:hover {
 }
 
 /* =====================================================
-   DESKTOP
-   ===================================================== */
+   GLOBAL ROOT
+===================================================== */
 
 #root {
-  display: flex;
-  flex-direction: column;
+  display: block;
   width: 100%;
+  min-width: 0;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
   text-align: left;
 }
 
-/* Sidebar */
-aside {
-  width: clamp(190px, 17vw, 248px) !important;
-  min-height: 100vh;
-  flex-shrink: 0;
-}
+/* =====================================================
+   MAIN DASHBOARD
+===================================================== */
 
-/* Main content */
-main {
+.main-dashboard {
   width: 100%;
   min-width: 0;
-  flex: 1;
-}
-
-/* Header */
-main header {
-  width: 100% !important;
-  min-width: 0;
-}
-
-/* Filter section */
-main section {
-  min-width: 0;
-}
-
-/* Filter input and dropdown */
-main input,
-main select {
-  max-width: 100%;
-}
-
-/* KPI cards */
-main section:nth-of-type(2) {
-  width: 100%;
-}
-
-/* Tabel */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  vertical-align: middle;
-}
-
-th {
-  font-weight: 700;
-}
-
-td button {
-  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* =====================================================
-   LAPTOP DAN TABLET BESAR
-   ===================================================== */
+   HEADER
+===================================================== */
 
-@media (max-width: 1200px) {
-  main {
-    padding: 24px 16px !important;
-  }
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 
-  main section:nth-of-type(2) {
-    grid-template-columns: repeat(
-      auto-fit,
-      minmax(190px, 1fr)
-    ) !important;
-  }
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
 
-  main section:nth-of-type(3),
-  main section:nth-of-type(4) {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
+  background: #ffffff;
+  border-radius: 8px;
+}
 
-  main section:nth-of-type(3) > div,
-  main section:nth-of-type(4) > div {
-    width: 100% !important;
-  }
+.dashboard-header > div:first-child {
+  min-width: 0;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  color: #681813;
+  font-size: 24px;
+}
+
+.dashboard-header p {
+  margin: 3px 0 0;
+  color: #5c5954;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.dashboard-header > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.dashboard-header input {
+  width: 220px;
+  max-width: 100%;
+}
+
+/* =====================================================
+   FILTER
+===================================================== */
+.dashboard-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 20px;
+
+  width: 100%;
+  min-width: 0;
+  padding: 10px 20px;
+}
+
+.filter-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 240px));
+  gap: 10px;
+  min-width: 0;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 7px;
+
+  color: #4a4745;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.filter-field select {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
+
+  border: 1px solid #d6d1c9;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #211f1d;
+  font-size: 13px;
+}
+
+.reset-button {
+  width: 180px;
+  height: 48px;
+  min-width: 0;
+
+  border: 1px solid #c9a227;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #681813;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* =====================================================
+   KPI
+===================================================== */
+.dashboard-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.dashboard-kpi-card {
+  min-width: 0;
+  min-height: 112px;
+  padding: 16px;
+
+  background: #ffffff;
+  border: 1px solid #d6d1c9;
+  border-radius: 12px;
+
+  box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* =====================================================
+   CHART + EQUIPMENT
+===================================================== */
+.dashboard-chart-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 2fr)
+    minmax(260px, 1fr);
+
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.dashboard-chart-grid > div {
+  min-width: 0;
+}
+
+/* =====================================================
+   WORK ORDER + COMPLIANCE
+===================================================== */
+.dashboard-bottom-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(280px, 1fr);
+
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.dashboard-bottom-grid > div {
+  min-width: 0;
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
+.dashboard-table-wrapper {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.dashboard-table-wrapper table {
+  width: 100%;
+  min-width: 600px;
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+.dashboard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  min-width: 0;
+  padding: 20px 24px;
+
+  background: #ffffff;
+  border-radius: 8px;
+
+  color: #9ca3af;
+  font-size: 12px;
 }
 
 /* =====================================================
    TABLET
-   ===================================================== */
+===================================================== */
 
-@media (max-width: 900px) {
-  aside {
-    width: 190px !important;
-    padding: 24px 12px 16px !important;
+@media (max-width: 1000px) {
+  .dashboard-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  main {
-    padding: 20px 12px !important;
-    gap: 16px !important;
-  }
-
-  main header {
-    padding: 12px !important;
-    flex-wrap: wrap;
-  }
-
-  main header h1 {
-    font-size: 22px !important;
-  }
-
-  main header p {
-    line-height: 1.5;
-  }
-
-  main section:first-of-type {
-    padding: 8px 0 !important;
-  }
-
-  main section:first-of-type > div {
-    width: 100%;
-  }
-
-  main section:first-of-type label {
-    flex: 1 1 180px;
-  }
-
-  main section:first-of-type select {
-    width: 100% !important;
-  }
-
-  main section:first-of-type button {
-    width: 150px !important;
-  }
-
-  main section:nth-of-type(2) {
-    grid-template-columns: repeat(
-      auto-fit,
-      minmax(180px, 1fr)
-    ) !important;
-  }
-
-  main section:nth-of-type(3),
-  main section:nth-of-type(4) {
-    grid-template-columns: 1fr !important;
-  }
-
-  main section:nth-of-type(4) > div {
-    width: 100% !important;
-  }
-
-  main footer {
-    gap: 16px;
-    flex-wrap: wrap;
+  .dashboard-chart-grid,
+  .dashboard-bottom-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 /* =====================================================
-   SMARTPHONE
-   ===================================================== */
+   MOBILE
+===================================================== */
 
 @media (max-width: 768px) {
-  #root {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
+  .main-dashboard {
+    gap: 16px;
   }
 
-  aside {
-    width: 72px !important;
-    min-width: 72px !important;
-    padding: 20px 8px !important;
+  .dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px;
   }
 
-  aside nav button {
-    justify-content: center !important;
-    padding: 10px 4px !important;
-    gap: 0 !important;
+  .dashboard-header > div:last-child {
+    width: 100%;
+    justify-content: flex-end;
   }
 
-  /*
-    Menyembunyikan teks menu sidebar.
-    Elemen pertama tetap berupa bullet berwarna gold.
-  */
-  aside nav button span:last-child {
-    display: none;
+  .dashboard-header input {
+    width: 100%;
   }
 
-  aside nav button span:first-child {
-    flex: 0 0 auto !important;
+  .dashboard-filters {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 0;
   }
 
-  /*
-    Menyesuaikan logo CMMS.
-  */
-  aside > div:first-child > div:first-child > div:first-child {
-    font-size: 20px !important;
-    text-align: center;
+  .filter-fields {
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
   }
 
-  aside > div:first-child > div:first-child > div:last-child {
-    display: none;
-  }
-
-  /*
-    Menyesuaikan profil pengguna pada sidebar.
-  */
-  aside > div:last-child {
-    justify-content: center !important;
-    padding: 8px 4px !important;
-    gap: 0 !important;
-  }
-
-  aside > div:last-child > div:last-child {
-    display: none;
-  }
-
-  main {
-    width: calc(100% - 72px);
-    min-width: 0;
-    padding: 12px !important;
-    gap: 14px !important;
-  }
-
-  main header {
-    padding: 12px !important;
-    align-items: flex-start !important;
-    gap: 12px !important;
-  }
-
-  main header h1 {
-    font-size: 20px !important;
-    line-height: 1.3;
-  }
-
-  main header p {
-    font-size: 11px !important;
-    line-height: 1.5;
-  }
-
-  /*
-    Input search dibuat lebih kecil pada smartphone.
-  */
-  main header input {
-    width: 150px !important;
+  .filter-field,
+  .filter-field select {
+    width: 100%;
     max-width: 100%;
   }
 
-  /*
-    Filter disusun vertikal.
-  */
-  main section:first-of-type {
-    padding: 4px 0 !important;
-    align-items: stretch !important;
-    flex-direction: column !important;
-    gap: 12px !important;
-  }
-
-  main section:first-of-type > div:first-child {
+  .reset-button {
     width: 100%;
-    flex-direction: column !important;
-    align-items: stretch !important;
+    max-width: 100%;
   }
 
-  main section:first-of-type label {
-    width: 100% !important;
-    flex: 1 1 auto;
+  .dashboard-kpi-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  main section:first-of-type select {
-    width: 100% !important;
+  .dashboard-chart-grid,
+  .dashboard-bottom-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  main section:first-of-type button {
-    width: 100% !important;
-  }
-
-  /*
-    KPI card menjadi satu kolom.
-  */
-  main section:nth-of-type(2) {
-    grid-template-columns: 1fr !important;
-  }
-
-  /*
-    Chart dan Equipment Status menjadi satu kolom.
-  */
-  main section:nth-of-type(3) {
-    grid-template-columns: 1fr !important;
-  }
-
-  /*
-    Work Order dan Compliance menjadi satu kolom.
-  */
-  main section:nth-of-type(4) {
-    grid-template-columns: 1fr !important;
-  }
-
-  main section:nth-of-type(4) > div {
-    width: 100% !important;
-  }
-
-  /*
-    Tabel dapat digeser secara horizontal tanpa merusak layout utama.
-  */
-  main section:nth-of-type(4) table {
-    min-width: 520px;
-  }
-
-  main section:nth-of-type(4) {
-    overflow-x: auto;
-  }
-
-  main footer {
-    padding: 16px !important;
-    align-items: flex-start !important;
+  .dashboard-footer {
+    align-items: flex-start;
     flex-direction: column;
     gap: 8px;
-  }
-}
-
-/* =====================================================
-   SMARTPHONE KECIL
-   ===================================================== */
-
-@media (max-width: 480px) {
-  aside {
-    width: 58px !important;
-    min-width: 58px !important;
-    padding: 16px 5px !important;
-  }
-
-  main {
-    width: calc(100% - 58px);
-    padding: 10px !important;
-    gap: 12px !important;
-  }
-
-  main header {
-    padding: 10px !important;
-  }
-
-  main header h1 {
-    font-size: 18px !important;
-  }
-
-  main header p {
-    font-size: 10px !important;
-  }
-
-  main header input {
-    width: 125px !important;
-  }
-
-  main header button {
-    font-size: 20px !important;
-  }
-
-  main section:nth-of-type(2) > div {
-    padding: 12px !important;
-  }
-
-  main section:nth-of-type(2) > div > div:nth-child(2) {
-    font-size: 23px !important;
-  }
-
-  main footer {
-    font-size: 10px !important;
+    padding: 16px;
   }
 }
 
 /* =====================================================
    PENGATURAN AKSESIBILITAS
    ===================================================== */
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -453,45 +382,50 @@ td button {
   }
 }
 
-
-/* Halaman login */
-
+/*=======================================================
+ HALAMAN LOGIN 
+ ========================================================*/
 .login-page {
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  height: auto;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: #f8f7f5;
 }
 
 .login-container {
   display: flex;
+  flex-direction: row;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
   border-radius: 20px;
   background: #ffffff;
 }
-/* Panel kiri */
 
+/* =====================================================
+PANEL KIRI
+ ===================================================== */
 .login-brand-panel {
   flex: 0 0 36%;
   min-width: 360px;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   padding: 64px;
   background: #681813;
   color: #ffffff;
-
-  /* Panel kiri tidak ikut scroll */
   overflow: hidden;
 }
 
 .sidebar-brand-link {
+  display: inline-block;
   color: #ffffff;
   text-decoration: none;
   font-size: 32px;
   font-weight: 700;
+  line-height: 1;
 }
 
 .sidebar-brand-link:visited {
@@ -538,8 +472,9 @@ td button {
   line-height: 1.4;
 }
 
-/* Panel kanan */
-
+/* ==================================================== 
+PANEL KANAN
+======================================================= */
 .login-form-panel {
   flex: 1;
   min-width: 0;
@@ -572,8 +507,9 @@ td button {
   line-height: 1.5;
 }
 
-/* Form */
-
+/* =====================================================
+Form 
+======================================================= */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -610,7 +546,9 @@ td button {
   box-shadow: 0 0 0 3px rgba(104, 24, 19, 0.1);
 }
 
-/* Remember me dan forgot password */
+/* =====================================================
+Remember me dan forgot password 
+======================================================= */
 
 .login-options {
   display: flex;
@@ -633,22 +571,6 @@ td button {
   margin: 0;
   accent-color: #681813;
   cursor: pointer;
-}
-
-.forgot-password,
-.create-account-button {
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: #c9a227;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.forgot-password:hover,
-.create-account-button:hover {
-  text-decoration: underline;
 }
 
 /* Pesan error */
@@ -696,12 +618,6 @@ td button {
 
 .operator-login-button:hover {
   background: #fffaf0;
-}
-
-/* Create account */
-
-.create-account-button {
-  margin-top: 22px;
 }
 
 /* Akun dummy */
@@ -771,6 +687,7 @@ td button {
     width: 100%;
   }
 }
+
 /* Overlay notifikasi berhasil */
 
 .success-overlay {
@@ -901,7 +818,7 @@ td button {
   top: 0;
   width: 248px;
   height: 100vh;
-  flex: 0 0 248px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -909,6 +826,10 @@ td button {
   background: #681813;
   color: white;
   overflow-y: auto;
+}
+
+.sidebar-top {
+  padding: 28px 18px 20px;
 }
 
 .sidebar-brand h1 {
@@ -921,12 +842,13 @@ td button {
   color: #e3c770;
   font-size: 9px;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .sidebar-menu {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .sidebar-menu-item {
@@ -934,8 +856,8 @@ td button {
   align-items: center;
   gap: 12px;
   min-height: 42px;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 12px 14px;
+  border-radius: 16px;
   color: white;
   text-decoration: none;
   font-size: 12px;
@@ -951,28 +873,135 @@ td button {
   color: #c9a227;
 }
 
+/* =======================================================
+   PROFILE SIDEBAR
+======================================================= */
+.sidebar-profile-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .sidebar-profile {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 10px;
-  border-radius: 8px;
-  background: #59120e;
-  font-size: 11px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  background: transparent;
+  color: #ffffff;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.sidebar-profile span {
-  display: block;
+.sidebar-profile:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #c9a227;
 }
 
 .profile-initial {
-  color: white;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  color: #ffffff;
+  background: transparent;
+  font-size: 14px;
   font-weight: 700;
+}
+
+.profile-information {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.profile-information strong {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.profile-information span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+/* =======================================================
+   PROFILE DROPDOWN
+======================================================= */
+.profile-dropdown {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  width: 100%;
+  padding: 8px;
+  background: #ffffff;
+  color: #681813;
+  border: 1px solid #d6cfc7;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.18),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+
+  animation: profileDropdownIn 0.18s ease-out;
+}
+
+.logout-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #681813;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.logout-button:hover {
+  background: #f8f1e7;
+  color: #50120f;
+}
+
+@keyframes profileDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .app-main {
   flex: 1;
   min-width: 0;
+  width: 100%;
+  min-height: 100vh;
   padding: 28px 10px;
 }
 
@@ -1018,7 +1047,6 @@ td button {
 }
 
 /* Filter */
-
 .equipment-filters {
   display: flex;
   align-items: end;
@@ -1057,7 +1085,6 @@ td button {
 }
 
 /* Button */
-
 .primary-button,
 .secondary-button {
   min-height: 44px;
@@ -1082,7 +1109,6 @@ td button {
 }
 
 /* Summary */
-
 .equipment-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1125,7 +1151,6 @@ td button {
 }
 
 /* Table */
-
 .table-card {
   width: 100%;
   background: white;
@@ -1191,7 +1216,6 @@ tbody tr:nth-child(even) {
 }
 
 /* Detail */
-
 .equipment-detail-header {
   display: flex;
   align-items: center;
@@ -1275,7 +1299,6 @@ tbody tr:nth-child(even) {
 }
 
 /* Responsive */
-
 @media (max-width: 900px) {
   .app-sidebar {
     width: 210px;
@@ -1293,20 +1316,61 @@ tbody tr:nth-child(even) {
 
 @media (max-width: 680px) {
   .app-layout {
-    flex-direction: column;
+    display: block;
   }
 
   .app-sidebar {
     position: static;
     width: 100%;
     height: auto;
-    flex-basis: auto;
+    overflow: visible;
+  }
+
+  .sidebar-top {
+    padding: 20px 16px;
+  }
+
+  .sidebar-brand-link {
+    font-size: 38px;
+  }
+
+  .sidebar-brand p {
+    margin-bottom: 20px;
   }
 
   .sidebar-menu {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
+
+  .sidebar-menu-item {
+    min-height: 46px;
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .sidebar-profile {
+    margin: 12px 16px 20px;
+  }
+
+  .kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 1000px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
   .app-main {
     padding: 16px;

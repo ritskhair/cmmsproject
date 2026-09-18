@@ -1,4 +1,6 @@
-import { NavLink, Outlet, Link } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { clearAuthSession } from "../utils/auth";
 
 const menuItems = [
   {
@@ -20,15 +22,26 @@ const menuItems = [
 ];
 
 export default function DashboardLayout() {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    clearAuthSession();
+    navigate("/login");
+  };
+
   return (
     <div className="app-layout">
-      <aside className="app-sidebar">
+      <aside className="app-sidebar" aria-label="Main navigation">
         <div className="sidebar-top">
           <div className="sidebar-brand">
-            <Link to="/login" className="sidebar-brand-link">
+            <span className="sidebar-brand-link">
               CMMS
-            </Link>
-            <p>MAINTENANCE MANAGEMENT</p>
+            </span>
+
+            <p className="sidebar-brand-subtitle">
+              MAINTENANCE MANAGEMENT
+            </p>
           </div>
 
           <nav className="sidebar-menu">
@@ -37,23 +50,54 @@ export default function DashboardLayout() {
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) =>
-                  `sidebar-menu-item ${isActive ? "active" : ""}`
+                  `sidebar-menu-item${isActive ? " active" : ""}`
                 }
               >
-                <span className="sidebar-bullet">•</span>
-                <span>{item.label}</span>
+                <span className="sidebar-bullet" aria-hidden="true">
+                  •
+                </span>
+
+                <span className="sidebar-menu-label">
+                  {item.label}
+                </span>
               </NavLink>
             ))}
           </nav>
         </div>
 
-        <div className="sidebar-profile">
-          <span className="profile-initial">SA</span>
+        <div className="sidebar-profile-wrapper">
+          <button
+            type="button"
+            className="sidebar-profile"
+            onClick={() => setIsProfileOpen((prev) => !prev)}
+          >
+            <span className="profile-initial">ADM</span>
 
-          <div>
-            <strong>Syamsabillah</strong>
-            <span>Engineering</span>
-          </div>
+            <div className="profile-information">
+              <strong>ADMIN</strong>
+              <span>Engineering</span>
+            </div>
+          </button>
+
+          {isProfileOpen && (
+            <div className="profile-dropdown">
+              <div className="profile-dropdown-header">
+                <span>ACCOUNT</span>
+              </div>
+
+              <button
+                type="button"
+                className="logout-button"
+                onClick={handleLogout}
+              >
+                <span className="logout-icon" aria-hidden="true">
+                  ↪
+                </span>
+
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 

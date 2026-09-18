@@ -44,7 +44,12 @@ export default function Login() {
   }
 };
 
+<<<<<<< HEAD
   const handleOperatorLogin = async () => {
+=======
+
+  const handleOperatorLogin = () => {
+>>>>>>> origin/main
     setError("");
 
     try {
@@ -58,14 +63,6 @@ export default function Login() {
       setError(requestError instanceof Error ? requestError.message : "Login operator gagal.");
     }
   };
-
-  /*const handleForgotPassword = () => {
-    alert("Fitur reset password belum tersedia.");
-  };*/
-
-  /*const handleCreateAccount = () => {
-    alert("Fitur pembuatan akun belum tersedia.");
-  };*/
 
   return (
     <main className="login-page">
