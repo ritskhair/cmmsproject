@@ -19,8 +19,12 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 
 @router.post("/operator", response_model=OperatorLoginResponse)
 def operator_login(request: Request):
-    if not operator_ip_allowed(request.client.host if request.client else None):
-        raise HTTPException(status_code=403, detail="Operator login is only available from the factory network")
+    client_host = request.client.host if request.client else None
+    if not operator_ip_allowed(client_host):
+        raise HTTPException(
+            status_code=403,
+            detail=f"Operator login is only available from the factory network. Detected client IP: {client_host or 'unknown'}",
+        )
     return {"token": create_session(OperatorSession()), "role": "operator"}
 
 

@@ -1,4 +1,20 @@
-export type UserRole = "admin" | "operator";
+export type UserRole =
+  | "super_admin"
+  | "general_manager"
+  | "manager"
+  | "team_leader"
+  | "teknisi"
+  | "operator";
+
+export type AppPermission = "dashboard" | "work-orders" | "equipment" | "user-management";
+
+const rolePermissions: Record<Exclude<UserRole, "operator">, AppPermission[]> = {
+  super_admin: ["dashboard", "work-orders", "equipment", "user-management"],
+  general_manager: ["dashboard", "work-orders", "equipment"],
+  manager: ["dashboard", "work-orders", "equipment"],
+  team_leader: ["work-orders", "equipment"],
+  teknisi: ["work-orders"],
+};
 
 const AUTH_KEY = "cmmsAuth";
 
@@ -49,4 +65,13 @@ export function clearAuthSession() {
 
 export function isOperatorRole(role?: string) {
   return role === "operator";
+}
+
+export function canAccess(role: UserRole | undefined, permission: AppPermission) {
+  return role !== "operator" && role !== undefined && role in rolePermissions && rolePermissions[role as Exclude<UserRole, "operator">].includes(permission);
+}
+
+export function getLandingPath(role: UserRole) {
+  if (canAccess(role, "dashboard")) return "/dashboard";
+  return "/work-orders";
 }

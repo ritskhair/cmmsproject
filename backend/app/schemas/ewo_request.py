@@ -23,6 +23,7 @@ class EwoRequestCreate(BaseModel):
     requestor_name: str
     department: str
     equipment_id: UUID
+    component_id: UUID
     shift: str
     team_leader_name: str
     failure_type: FailureType
@@ -35,6 +36,7 @@ class EwoRequestUpdate(BaseModel):
     requestor_name: str | None = None
     department: str | None = None
     equipment_id: UUID | None = None
+    component_id: UUID | None = None
     shift: str | None = None
     team_leader_name: str | None = None
     failure_type: FailureType | None = None
@@ -51,6 +53,7 @@ class EwoRequestResponse(BaseModel):
     requestor_name: str
     department: str
     equipment_id: UUID
+    component_id: UUID | None
     shift: str
     team_leader_name: str
     failure_type: FailureType

@@ -56,9 +56,17 @@ def update_account(account_id: UUID, payload: AccountUpdate, db: Session = Depen
 
 
 @router.delete("/{account_id}", status_code=204)
-def delete_account(account_id: UUID, db: Session = Depends(get_db), _=Depends(require_roles("super_admin"))):
+def delete_account(
+    account_id: UUID,
+    db: Session = Depends(get_db),
+    current_account=Depends(require_roles("super_admin")),
+):
     account = db.query(Account).filter(Account.id == account_id).first()
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
+    if account.id == current_account.id and account.role == "super_admin":
+        super_admin_count = db.query(Account).filter(Account.role == "super_admin").count()
+        if super_admin_count <= 1:
+            raise HTTPException(status_code=409, detail="The last super admin cannot delete their own account")
     db.delete(account)
     db.commit()

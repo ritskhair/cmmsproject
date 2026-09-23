@@ -5,16 +5,20 @@ import {
 } from "react";
 
 import { useNavigate } from "react-router-dom";
-import { apiRequest, type Equipment } from "../../utils/api";
+import { apiRequest, type Component, type Equipment, type Section } from "../../utils/api";
 
 export default function OperatorEwoForm() {
   const navigate = useNavigate();
 
   const [requestor, setRequestor] = useState("");
   const [department, setDepartment] = useState("");
+  const [sections, setSections] = useState<Section[]>([]);
+  const [sectionId, setSectionId] = useState("");
   const [section, setSection] = useState<"1" | "2" | "3" | "4" | "5">("1");
   const [equipmentId, setEquipmentId] = useState("");
   const [equipmentOptions, setEquipmentOptions] = useState<Equipment[]>([]);
+  const [componentId, setComponentId] = useState("");
+  const [componentOptions, setComponentOptions] = useState<Component[]>([]);
   const [teamLeader, setTeamLeader] = useState("");
   const [shift, setShift] = useState("");
   const [failureType, setFailureType] = useState("");
@@ -24,32 +28,63 @@ export default function OperatorEwoForm() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [loadingEquipment, setLoadingEquipment] = useState(false);
+  const [loadingComponents, setLoadingComponents] = useState(false);
 
   useEffect(() => {
     let active = true;
-    setLoadingEquipment(true);
-    setEquipmentId("");
-    apiRequest<Equipment[]>(`/equipment/operator/equipment?section=${section}`)
-      .then((equipment) => {
-        if (active) setEquipmentOptions(equipment);
+    apiRequest<Section[]>("/equipment/sections")
+      .then((loadedSections) => {
+        if (!active) return;
+        setSections(loadedSections);
+        const firstSection = loadedSections[0];
+        if (firstSection && !sectionId) {
+          setSectionId(firstSection.id);
+          setSection(firstSection.code as typeof section);
+        }
       })
       .catch((requestError) => {
         if (active) setError(requestError instanceof Error ? requestError.message : "Equipment gagal dimuat.");
       })
-      .finally(() => {
-        if (active) setLoadingEquipment(false);
-      });
     return () => {
       active = false;
     };
-  }, [section]);
+  }, [sectionId]);
+
+  useEffect(() => {
+    if (!sectionId) return;
+    let active = true;
+    setLoadingEquipment(true);
+    setEquipmentId("");
+    setComponentId("");
+    setComponentOptions([]);
+    apiRequest<Equipment[]>(`/equipment/sections/${sectionId}/machines`)
+      .then((equipment) => { if (active) setEquipmentOptions(equipment); })
+      .catch((requestError) => { if (active) setError(requestError instanceof Error ? requestError.message : "Machine gagal dimuat."); })
+      .finally(() => { if (active) setLoadingEquipment(false); });
+    return () => { active = false; };
+  }, [sectionId]);
+
+  useEffect(() => {
+    if (!equipmentId) return;
+    let active = true;
+    setLoadingComponents(true);
+    setComponentId("");
+    apiRequest<Component[]>(`/equipment/machines/${equipmentId}/components`)
+      .then((components) => { if (active) setComponentOptions(components); })
+      .catch((requestError) => { if (active) setError(requestError instanceof Error ? requestError.message : "Component gagal dimuat."); })
+      .finally(() => { if (active) setLoadingComponents(false); });
+    return () => { active = false; };
+  }, [equipmentId]);
 
   const handleSectionChange = (
     nextSection: string,
   ) => {
-    if (!/^[1-5]$/.test(nextSection)) return;
-    setSection(nextSection as "1" | "2" | "3" | "4" | "5");
+    const selected = sections.find((item) => item.id === nextSection);
+    if (!selected) return;
+    setSectionId(selected.id);
+    setSection(selected.code as typeof section);
     setEquipmentId("");
+    setComponentId("");
   };
 
   const handleSubmit = async (
@@ -62,6 +97,7 @@ export default function OperatorEwoForm() {
       !department ||
       !section ||
       !equipmentId ||
+      !componentId ||
       !teamLeader ||
       !shift ||
       !failureType ||
@@ -82,6 +118,7 @@ export default function OperatorEwoForm() {
           requestor_name: requestor,
           department,
           equipment_id: equipmentId,
+          component_id: componentId,
           shift,
           team_leader_name: teamLeader,
           failure_type: failureType === "Total" ? "total" : "partial",
@@ -210,7 +247,7 @@ export default function OperatorEwoForm() {
             </label>
 
             <select
-              value={section}
+              value={sectionId}
               onChange={(event) =>
                 handleSectionChange(
                   event.target.value,
@@ -218,11 +255,8 @@ export default function OperatorEwoForm() {
               }
               style={styles.input}
             >
-              <option value="1">Section 1</option>
-              <option value="2">Section 2</option>
-              <option value="3">Section 3</option>
-              <option value="4">Section 4</option>
-              <option value="5">Section 5</option>
+              <option value="">Pilih section</option>
+              {sections.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
 
             <label style={styles.label}>
@@ -237,7 +271,7 @@ export default function OperatorEwoForm() {
               style={styles.input}
             >
               <option value="">
-                {loadingEquipment ? "Memuat equipment..." : "Pilih equipment"}
+                {loadingEquipment ? "Memuat machine..." : "Pilih machine"}
               </option>
 
               {equipmentOptions.map((item) => (
@@ -248,6 +282,12 @@ export default function OperatorEwoForm() {
                   {item.asset_id} - {item.name}
                 </option>
               ))}
+            </select>
+
+            <label style={styles.label}>Component *</label>
+            <select value={componentId} onChange={(event) => setComponentId(event.target.value)} style={styles.input} disabled={!equipmentId}>
+              <option value="">{loadingComponents ? "Memuat component..." : "Pilih component"}</option>
+              {componentOptions.map((item) => <option key={item.id} value={item.id}>{item.asset_id} - {item.name}</option>)}
             </select>
           </section>
 

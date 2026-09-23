@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import require_roles
 from app.models.equipment import Equipment
+from app.models.component import Component
 from app.models.ewo_request import EwoRequest
 from app.schemas.ewo_request import EwoRequestCreate, EwoRequestResponse, EwoRequestUpdate, EwoStatus
 
@@ -31,9 +32,14 @@ def list_ewo_requests(db: Session = Depends(get_db), _=Depends(require_roles(*RE
 
 @router.post("", response_model=EwoRequestResponse, status_code=201)
 def create_ewo_request(payload: EwoRequestCreate, db: Session = Depends(get_db), _=Depends(require_roles(*CREATE_ROLES))):
+    component = db.query(Component).filter(Component.id == payload.component_id).first()
     equipment = db.query(Equipment).filter(Equipment.id == payload.equipment_id, Equipment.section == payload.section.value).first()
-    if not equipment:
-        raise HTTPException(status_code=404, detail="Equipment not found in selected section")
+    if component and component.machine_id != payload.equipment_id:
+        component = None
+    if component:
+        equipment = db.query(Equipment).filter(Equipment.id == component.machine_id, Equipment.section == payload.section.value).first()
+    if not component or not equipment:
+        raise HTTPException(status_code=404, detail="Component is not part of the selected machine and section")
     ewo = EwoRequest(ewo_number=next_ewo_number(db), **payload.model_dump())
     db.add(ewo)
     db.commit()
@@ -55,12 +61,16 @@ def update_ewo_request(ewo_id: UUID, payload: EwoRequestUpdate, db: Session = De
     if not ewo:
         raise HTTPException(status_code=404, detail="EWO request not found")
     values = payload.model_dump(exclude_unset=True)
-    if "equipment_id" in values or "section" in values:
+    if "equipment_id" in values or "component_id" in values or "section" in values:
         equipment_id = values.get("equipment_id", ewo.equipment_id)
+        component_id = values.get("component_id", ewo.component_id)
         section = values.get("section", ewo.section)
         section = section.value if hasattr(section, "value") else section
+        component = db.query(Component).filter(Component.id == component_id).first() if component_id else None
+        if not component or component.machine_id != equipment_id:
+            raise HTTPException(status_code=404, detail="Component is not part of the selected machine")
         if not db.query(Equipment).filter(Equipment.id == equipment_id, Equipment.section == section).first():
-            raise HTTPException(status_code=404, detail="Equipment not found in selected section")
+            raise HTTPException(status_code=404, detail="Machine not found in selected section")
     for key, value in values.items():
         setattr(ewo, key, value)
     db.commit()

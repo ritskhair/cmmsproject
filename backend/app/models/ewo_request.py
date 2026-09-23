@@ -17,6 +17,7 @@ class EwoRequest(Base):
     department = Column(String(100), nullable=False)
     section = Column(String(10), nullable=False)
     equipment_id = Column(UUID(as_uuid=True), ForeignKey("equipment.id"), nullable=False)
+    component_id = Column(UUID(as_uuid=True), ForeignKey("components.id"), nullable=True)
     shift = Column(String(50), nullable=False)
     team_leader_name = Column(String(150), nullable=False)
     failure_type = Column(String(20), nullable=False)
@@ -26,6 +27,7 @@ class EwoRequest(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     equipment = relationship("Equipment")
+    component = relationship("Component")
     maintenance = relationship(
         "EwoMaintenance", back_populates="ewo_request", cascade="all, delete-orphan"
     )

@@ -10,7 +10,7 @@ import UserManagement from "./pages/Section 4 - User Management/01 - User Manage
 
 import DashboardLayout from "./component/DashboardLayout";
 import OperatorLayout from "./component/OperatorLayout";
-import RequireAdmin from "./component/RequireAdmin";
+import RequireAdmin, { RequireRoleAccess } from "./component/RequireAdmin";
 import RequireOperator from "./component/RequireOperator";
 
 export default function App() {
@@ -34,14 +34,19 @@ export default function App() {
         {/* Halaman admin dengan sidebar */}
         <Route element={<RequireAdmin />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<MaintenanceDashboard />} />
-            <Route path="/equipment" element={<EquipmentList />} />
-            <Route
-              path="/equipment/:equipmentId"
-              element={<EquipmentDetail />}
-            />
-            <Route path="/work-orders" element={<WorkOrders />} />
-            <Route path="/user-management" element={<UserManagement />} />
+            <Route element={<RequireRoleAccess permission="dashboard" />}>
+              <Route path="/dashboard" element={<MaintenanceDashboard />} />
+            </Route>
+            <Route element={<RequireRoleAccess permission="equipment" />}>
+              <Route path="/equipment" element={<EquipmentList />} />
+              <Route path="/equipment/:equipmentId" element={<EquipmentDetail />} />
+            </Route>
+            <Route element={<RequireRoleAccess permission="work-orders" />}>
+              <Route path="/work-orders" element={<WorkOrders />} />
+            </Route>
+            <Route element={<RequireRoleAccess permission="user-management" />}>
+              <Route path="/user-management" element={<UserManagement />} />
+            </Route>
           </Route>
         </Route>
 

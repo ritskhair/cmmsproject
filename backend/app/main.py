@@ -25,6 +25,11 @@ app.include_router(maintenance.router)
 def read_root():
     return {"message": "EWO Management API is running"}
 
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "service": "cmms-backend"}
+
 @app.get("/test-db")
 def test_db():
     with engine.connect() as connection:

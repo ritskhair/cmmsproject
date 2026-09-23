@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {saveAuthSession,} from "../../utils/auth";
+import { getLandingPath, saveAuthSession, type UserRole } from "../../utils/auth";
 import { apiRequest, type AccountLoginResponse, type OperatorLoginResponse } from "../../utils/api";
 
 export default function Login() {
@@ -32,12 +32,13 @@ export default function Login() {
       body: JSON.stringify({ username: email, password }),
     });
     setError("");
-    saveAuthSession("admin", email, result.role, result.token);
+    const role = result.role as UserRole;
+    saveAuthSession(role, email, role, result.token);
 
     setShowSuccess(true);
 
     setTimeout(() => {
-      navigate("/dashboard");
+      navigate(getLandingPath(role));
     }, 1500);
   } catch (requestError) {
     setError(requestError instanceof Error ? requestError.message : "Login gagal.");

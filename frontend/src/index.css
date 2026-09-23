@@ -1085,6 +1085,46 @@ Remember me dan forgot password
   font-family: inherit;
 }
 
+.equipment-form-card {
+  margin-bottom: 26px;
+  padding: 20px;
+  border: 1px solid #d5d2cc;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.equipment-form-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.equipment-form-header h2 {
+  margin: 0;
+  color: #4a4745;
+  font-size: 18px;
+}
+
+.equipment-form-header p {
+  margin: 6px 0 0;
+  color: #807d78;
+  font-size: 12px;
+}
+
+.equipment-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.equipment-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
 /* Button */
 .primary-button,
 .secondary-button {
@@ -2163,5 +2203,87 @@ tbody tr:nth-child(even) {
 
   .history-right {
     align-items: flex-start;
+  }
+}
+
+.equipment-hierarchy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.equipment-hierarchy .selected-row {
+  background: #f4efe9;
+}
+
+.equipment-hierarchy tbody tr {
+  cursor: pointer;
+}
+
+.component-panel {
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e6ddd4;
+  border-radius: 8px;
+  min-height: 260px;
+}
+
+.component-panel h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.component-panel > p {
+  margin: 0 0 18px;
+  color: #756b63;
+}
+
+.component-form {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.component-form label {
+  color: #595752;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.component-form input,
+.component-form select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d8cec5;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.component-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.component-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #eee7e1;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .equipment-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .equipment-hierarchy {
+    grid-template-columns: 1fr;
   }
 }

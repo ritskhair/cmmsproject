@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 export class ApiError extends Error {
   status: number;
@@ -27,10 +27,15 @@ export async function apiRequest<T>(
       ...options,
       headers,
     });
-  } catch {
+  } catch (requestError) {
+    const reason = requestError instanceof TypeError
+      ? "Periksa alamat API, CORS, dan firewall."
+      : requestError instanceof Error
+        ? requestError.message
+        : "Periksa alamat API, CORS, dan firewall.";
     throw new ApiError(
       0,
-      "Backend belum berjalan. Jalankan server FastAPI di port 8000 lalu coba lagi.",
+      `Backend tidak dapat dihubungi di ${API_BASE_URL}. ${reason}`,
     );
   }
 
@@ -74,7 +79,25 @@ export type Equipment = {
   name: string;
   type: string;
   section: "1" | "2" | "3" | "4" | "5";
+  section_id: string | null;
   status: "Operational" | "Warning" | "Critical";
   last_pm: string | null;
+  created_at: string;
+};
+
+export type Section = {
+  id: string;
+  code: string;
+  name: string;
+  active: boolean;
+};
+
+export type Component = {
+  id: string;
+  asset_id: string | null;
+  name: string;
+  type: string;
+  status: Equipment["status"];
+  machine_id: string;
   created_at: string;
 };

@@ -41,6 +41,40 @@ class EquipmentResponse(BaseModel):
     name: str
     type: str
     section: Section
+    section_id: UUID | None
     status: EquipmentStatus
     last_pm: datetime | None
+    created_at: datetime
+
+
+class SectionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    code: str
+    name: str
+    active: bool
+
+
+class ComponentCreate(BaseModel):
+    name: str
+    type: str
+    status: EquipmentStatus = "Operational"
+
+
+class ComponentUpdate(BaseModel):
+    name: str | None = None
+    type: str | None = None
+    status: EquipmentStatus | None = None
+
+
+class ComponentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    asset_id: str | None
+    name: str
+    type: str
+    status: EquipmentStatus
+    machine_id: UUID
     created_at: datetime

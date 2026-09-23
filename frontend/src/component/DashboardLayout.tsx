@@ -1,29 +1,44 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { clearAuthSession } from "../utils/auth";
+import { canAccess, clearAuthSession, getAuthSession, type AppPermission, type UserRole } from "../utils/auth";
 
 const menuItems = [
   {
     label: "Dashboard",
     path: "/dashboard",
+    permission: "dashboard" as AppPermission,
   },
   {
     label: "Work Orders",
     path: "/work-orders",
+    permission: "work-orders" as AppPermission,
   },
   {
     label: "Equipment",
     path: "/equipment",
+    permission: "equipment" as AppPermission,
   },
   {
     label: "User Management",
     path: "/user-management",
+    permission: "user-management" as AppPermission,
   },
 ];
+
+const roleLabels: Record<UserRole, string> = {
+  super_admin: "SUPER ADMIN",
+  general_manager: "GENERAL MANAGER",
+  manager: "MANAGER",
+  team_leader: "TEAM LEADER",
+  teknisi: "TEKNISI",
+  operator: "OPERATOR",
+};
 
 export default function DashboardLayout() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
+  const session = getAuthSession();
+  const roleLabel = session?.role && roleLabels[session.role] ? roleLabels[session.role] : "USER";
 
   const handleLogout = () => {
     clearAuthSession();
@@ -45,7 +60,7 @@ export default function DashboardLayout() {
           </div>
 
           <nav className="sidebar-menu">
-            {menuItems.map((item) => (
+            {menuItems.filter((item) => canAccess(session?.role, item.permission)).map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
@@ -71,10 +86,10 @@ export default function DashboardLayout() {
             className="sidebar-profile"
             onClick={() => setIsProfileOpen((prev) => !prev)}
           >
-            <span className="profile-initial">ADM</span>
+            <span className="profile-initial">{roleLabel.slice(0, 3)}</span>
 
             <div className="profile-information">
-              <strong>ADMIN</strong>
+              <strong>{roleLabel}</strong>
               <span>Engineering</span>
             </div>
           </button>
