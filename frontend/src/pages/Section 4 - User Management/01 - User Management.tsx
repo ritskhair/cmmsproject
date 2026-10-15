@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { apiRequest } from "../../utils/api";
 
@@ -38,6 +38,7 @@ export default function UserManagement() {
   const [modal, setModal] = useState<"add" | "edit" | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const menuRef = useRef<HTMLTableCellElement | null>(null);
   const [form, setForm] = useState<AccountForm>(emptyForm);
   const [error, setError] = useState("");
 
@@ -51,6 +52,17 @@ export default function UserManagement() {
   }
 
   useEffect(() => { void loadUsers(); }, []);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setActiveMenu(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const filteredUsers = useMemo(() => users.filter((user) => {
     const searchText = `${user.username} ${user.department || ""} ${user.position || ""} ${roleLabels[user.role]}`.toLowerCase();
@@ -92,7 +104,7 @@ export default function UserManagement() {
   }
 
   async function deleteUser(user: Account) {
-    if (!window.confirm(`Hapus user ${user.username}?`)) return;
+    if (!window.confirm(`Hapus user ${user.username}? Tindakan ini tidak dapat dibatalkan.`)) return;
     try {
       await apiRequest<void>(`/accounts/${user.id}`, { method: "DELETE" });
       await loadUsers();
@@ -115,7 +127,7 @@ export default function UserManagement() {
       {error && <p className="login-error">{error}</p>}
       <section className="user-table-card"><div className="table-toolbar"><div className="user-search-wrapper"><span>⌕</span><input placeholder="Search" value={search} onChange={(event) => setSearch(event.target.value)} /></div><div className="toolbar-actions"><button type="button" className="secondary-button" onClick={() => setShowFilter((value) => !value)}>☷ &nbsp; Tampilkan</button><button type="button" className="primary-button" onClick={openAdd}>＋ Tambah Data</button></div></div>
         {showFilter && <div className="filter-panel"><label htmlFor="role-filter">Filter Role</label><select id="role-filter" value={selectedRole} onChange={(event) => setSelectedRole(event.target.value)}><option value="">All roles</option>{roles.map((role) => <option key={role} value={role}>{roleLabels[role]}</option>)}</select><button type="button" className="reset-filter-button" onClick={() => { setSearch(""); setSelectedRole(""); }}>Reset</button></div>}
-        <div className="table-wrapper"><table className="user-table"><thead><tr><th>No</th><th>Username</th><th>Department</th><th>Position</th><th>Type</th><th></th></tr></thead><tbody>{filteredUsers.length ? filteredUsers.map((user, index) => <tr key={user.id}><td>{index + 1}</td><td>{user.username}</td><td>{user.department || "-"}</td><td>{user.position || "-"}</td><td>{roleLabels[user.role]}</td><td className="action-cell"><button type="button" className="menu-button" onClick={() => setActiveMenu(activeMenu === user.id ? null : user.id)}>⋮</button>{activeMenu === user.id && <div className="row-action-menu"><button type="button" onClick={() => openEdit(user)}>Edit</button><button type="button" onClick={() => void deleteUser(user)}>Hapus</button></div>}</td></tr>) : <tr><td colSpan={6} className="empty-table">Data user tidak ditemukan.</td></tr>}</tbody></table></div><div className="table-footer"><span>{filteredUsers.length} data</span></div></section>
+        <div className="table-wrapper"><table className="user-table"><thead><tr><th>No</th><th>Username</th><th>Department</th><th>Position</th><th>Type</th><th>Aksi</th></tr></thead><tbody>{filteredUsers.length ? filteredUsers.map((user, index) => <tr key={user.id}><td>{index + 1}</td><td>{user.username}</td><td>{user.department || "-"}</td><td>{user.position || "-"}</td><td>{roleLabels[user.role]}</td><td className="action-cell" ref={activeMenu === user.id ? menuRef : null}><button type="button" className="menu-button" onClick={() => setActiveMenu(activeMenu === user.id ? null : user.id)} title="Pilihan aksi">⋮</button>{activeMenu === user.id && <div className="row-action-menu"><button type="button" onClick={() => openEdit(user)}>✏️ Edit</button><button type="button" style={{ color: "#b22417", fontWeight: 600 }} onClick={() => void deleteUser(user)}>🗑️ Hapus</button></div>}</td></tr>) : <tr><td colSpan={6} className="empty-table">Data user tidak ditemukan.</td></tr>}</tbody></table></div><div className="table-footer"><span>{filteredUsers.length} data</span></div></section>
       {modal && <div className="modal-overlay"><div className="user-modal"><div className="modal-header"><h2>{modal === "add" ? "Tambah Data User" : "Edit Data User"}</h2><button type="button" className="modal-close-button" onClick={() => setModal(null)}>×</button></div><div className="modal-form"><label htmlFor="user-name">Username</label><input id="user-name" value={form.username} onChange={(event) => updateField("username", event.target.value)} placeholder="Masukkan username" /><label htmlFor="user-password">Password {modal === "edit" && "(kosongkan jika tidak diubah)"}</label><input id="user-password" type="password" value={form.password} onChange={(event) => updateField("password", event.target.value)} placeholder="Masukkan password" /><label htmlFor="user-department">Department</label><input id="user-department" value={form.department} onChange={(event) => updateField("department", event.target.value)} placeholder="Masukkan department" /><label htmlFor="user-position">Position</label><input id="user-position" value={form.position} onChange={(event) => updateField("position", event.target.value)} placeholder="Masukkan posisi" /><label htmlFor="user-role">Type</label><select id="user-role" value={form.role} onChange={(event) => updateField("role", event.target.value)}>{roles.map((role) => <option key={role} value={role}>{roleLabels[role]}</option>)}</select></div><div className="modal-actions"><button type="button" className="secondary-button" onClick={() => setModal(null)}>Batal</button><button type="button" className="primary-button" onClick={() => void saveUser()}>Simpan</button></div></div></div>}
     </div>
   );

@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict
 
 EwoStatus = Literal["pending", "in_progress", "completed"]
 FailureType = Literal["total", "partial"]
+FailureCategory = Literal["electrical", "mechanical"]
 
 
 class Section(str, Enum):
@@ -23,10 +24,12 @@ class EwoRequestCreate(BaseModel):
     requestor_name: str
     department: str
     equipment_id: UUID
-    component_id: UUID
+    component_id: UUID | None = None
+    component_other_description: str | None = None
     shift: str
     team_leader_name: str
     failure_type: FailureType
+    failure_category: FailureCategory
     task_list: str
     special_note: str | None = None
 
@@ -37,9 +40,11 @@ class EwoRequestUpdate(BaseModel):
     department: str | None = None
     equipment_id: UUID | None = None
     component_id: UUID | None = None
+    component_other_description: str | None = None
     shift: str | None = None
     team_leader_name: str | None = None
     failure_type: FailureType | None = None
+    failure_category: FailureCategory | None = None
     task_list: str | None = None
     special_note: str | None = None
 
@@ -54,9 +59,11 @@ class EwoRequestResponse(BaseModel):
     department: str
     equipment_id: UUID
     component_id: UUID | None
+    component_other_description: str | None
     shift: str
     team_leader_name: str
     failure_type: FailureType
+    failure_category: FailureCategory | None
     task_list: str
     special_note: str | None
     status: EwoStatus

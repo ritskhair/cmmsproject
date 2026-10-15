@@ -72,9 +72,18 @@ class ComponentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
-    asset_id: str | None
     name: str
     type: str
     status: EquipmentStatus
     machine_id: UUID
     created_at: datetime
+    asset_id: str | None = None
+
+
+class EquipmentImportSummary(BaseModel):
+    success: bool
+    total_equipment_created: int
+    total_equipment_updated: int
+    total_components_added: int
+    errors: list[str] = []
+

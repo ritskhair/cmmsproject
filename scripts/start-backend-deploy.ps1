@@ -1,5 +1,5 @@
 param(
-  [string]$Host = "0.0.0.0",
+  [string]$BindHost = "0.0.0.0",
   [int]$Port = 8000,
   [Parameter(Mandatory = $true)]
   [string]$AllowedNetworks,
@@ -18,8 +18,9 @@ if (-not (Test-Path .\.env)) {
 . .\venv\Scripts\Activate.ps1
 $env:OPERATOR_ALLOWED_NETWORKS = $AllowedNetworks
 $env:CORS_ALLOWED_ORIGINS = $CorsOrigins
-Write-Host "Backend DEPLOY bind: http://$Host`:$Port"
+Write-Host "Backend DEPLOY bind: http://$BindHost`:$Port"
 Write-Host "Operator networks:  $env:OPERATOR_ALLOWED_NETWORKS"
 Write-Host "Allowed origins:    $env:CORS_ALLOWED_ORIGINS"
 Write-Host "Health check dari jaringan: http://<BACKEND_IP>`:$Port/health"
-python -m uvicorn app.main:app --host $Host --port $Port
+python -m uvicorn app.main:app --host $BindHost --port $Port
+

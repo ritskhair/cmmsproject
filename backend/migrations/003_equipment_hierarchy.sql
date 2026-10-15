@@ -5,13 +5,13 @@ CREATE TABLE IF NOT EXISTS sections (
     active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-INSERT INTO sections (code, name)
+INSERT INTO sections (id, code, name, active)
 VALUES
-    ('1', 'Section 1'),
-    ('2', 'Section 2'),
-    ('3', 'Section 3'),
-    ('4', 'Section 4'),
-    ('5', 'Section 5')
+    (gen_random_uuid(), '1', 'Section 1', TRUE),
+    (gen_random_uuid(), '2', 'Section 2', TRUE),
+    (gen_random_uuid(), '3', 'Section 3', TRUE),
+    (gen_random_uuid(), '4', 'Section 4', TRUE),
+    (gen_random_uuid(), '5', 'Section 5', TRUE)
 ON CONFLICT (code) DO NOTHING;
 
 ALTER TABLE equipment ADD COLUMN IF NOT EXISTS section_id UUID;
@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS components (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE components ADD COLUMN IF NOT EXISTS asset_id VARCHAR(50);
+CREATE UNIQUE INDEX IF NOT EXISTS components_asset_id_key ON components (asset_id);
 ALTER TABLE components ALTER COLUMN asset_id DROP NOT NULL;
 
 ALTER TABLE ewo_requests ADD COLUMN IF NOT EXISTS component_id UUID;

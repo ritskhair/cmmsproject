@@ -19,9 +19,11 @@ export default function OperatorEwoForm() {
   const [equipmentOptions, setEquipmentOptions] = useState<Equipment[]>([]);
   const [componentId, setComponentId] = useState("");
   const [componentOptions, setComponentOptions] = useState<Component[]>([]);
+  const [componentOtherDescription, setComponentOtherDescription] = useState("");
   const [teamLeader, setTeamLeader] = useState("");
   const [shift, setShift] = useState("");
   const [failureType, setFailureType] = useState("");
+  const [failureCategory, setFailureCategory] = useState("");
   const [taskList, setTaskList] = useState("");
   const [specialNote, setSpecialNote] = useState("");
 
@@ -30,6 +32,7 @@ export default function OperatorEwoForm() {
   const [loadingEquipment, setLoadingEquipment] = useState(false);
   const [loadingComponents, setLoadingComponents] = useState(false);
 
+  // Load sections once on mount only
   useEffect(() => {
     let active = true;
     apiRequest<Section[]>("/equipment/sections")
@@ -37,18 +40,18 @@ export default function OperatorEwoForm() {
         if (!active) return;
         setSections(loadedSections);
         const firstSection = loadedSections[0];
-        if (firstSection && !sectionId) {
+        if (firstSection) {
           setSectionId(firstSection.id);
           setSection(firstSection.code as typeof section);
         }
       })
       .catch((requestError) => {
-        if (active) setError(requestError instanceof Error ? requestError.message : "Equipment gagal dimuat.");
-      })
+        if (active) setError(requestError instanceof Error ? requestError.message : "Section gagal dimuat.");
+      });
     return () => {
       active = false;
     };
-  }, [sectionId]);
+  }, []); // hanya sekali saat mount
 
   useEffect(() => {
     if (!sectionId) return;
@@ -87,20 +90,27 @@ export default function OperatorEwoForm() {
     setComponentId("");
   };
 
+  const isOtherComponent = componentId === "__other__";
+
   const handleSubmit = async (
     event: FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
+
+    const needsComponentId = !isOtherComponent && !componentId;
+    const needsOtherDesc = isOtherComponent && !componentOtherDescription.trim();
 
     if (
       !requestor ||
       !department ||
       !section ||
       !equipmentId ||
-      !componentId ||
+      (needsComponentId) ||
+      (needsOtherDesc) ||
       !teamLeader ||
       !shift ||
       !failureType ||
+      !failureCategory ||
       !taskList
     ) {
       setError(
@@ -118,10 +128,12 @@ export default function OperatorEwoForm() {
           requestor_name: requestor,
           department,
           equipment_id: equipmentId,
-          component_id: componentId,
+          component_id: isOtherComponent ? null : componentId,
+          component_other_description: isOtherComponent ? componentOtherDescription.trim() : null,
           shift,
           team_leader_name: teamLeader,
           failure_type: failureType === "Total" ? "total" : "partial",
+          failure_category: failureCategory,
           task_list: taskList,
           special_note: specialNote || null,
         }),
@@ -269,6 +281,7 @@ export default function OperatorEwoForm() {
                 setEquipmentId(event.target.value)
               }
               style={styles.input}
+              disabled={!sectionId || loadingEquipment}
             >
               <option value="">
                 {loadingEquipment ? "Memuat machine..." : "Pilih machine"}
@@ -285,9 +298,56 @@ export default function OperatorEwoForm() {
             </select>
 
             <label style={styles.label}>Component *</label>
-            <select value={componentId} onChange={(event) => setComponentId(event.target.value)} style={styles.input} disabled={!equipmentId}>
-              <option value="">{loadingComponents ? "Memuat component..." : "Pilih component"}</option>
-              {componentOptions.map((item) => <option key={item.id} value={item.id}>{item.asset_id} - {item.name}</option>)}
+            <select
+              value={componentId}
+              onChange={(event) => {
+                setComponentId(event.target.value);
+                if (event.target.value !== "__other__") {
+                  setComponentOtherDescription("");
+                }
+              }}
+              style={styles.input}
+              disabled={!equipmentId || loadingComponents}
+            >
+              <option value="">
+                {!equipmentId
+                  ? "Pilih machine terlebih dahulu"
+                  : loadingComponents
+                    ? "Memuat component..."
+                    : componentOptions.length === 0
+                      ? "Tidak ada component tersedia"
+                      : "Pilih component"}
+              </option>
+              {componentOptions.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.asset_id ? `${item.asset_id} - ` : ""}{item.name} ({item.type})
+                </option>
+              ))}
+              <option value="__other__">Other (Lainnya)</option>
+            </select>
+
+            {isOtherComponent && (
+              <>
+                <label style={styles.label}>Jelaskan komponen yang rusak *</label>
+                <textarea
+                  value={componentOtherDescription}
+                  onChange={(event) => setComponentOtherDescription(event.target.value)}
+                  placeholder="Deskripsikan komponen yang tidak terdaftar di daftar di atas"
+                  rows={3}
+                  style={styles.textarea}
+                />
+              </>
+            )}
+
+            <label style={styles.label}>Type of Failure *</label>
+            <select
+              value={failureCategory}
+              onChange={(event) => setFailureCategory(event.target.value)}
+              style={styles.input}
+            >
+              <option value="">Pilih tipe kerusakan</option>
+              <option value="electrical">Electrical</option>
+              <option value="mechanical">Mechanical</option>
             </select>
           </section>
 
@@ -346,7 +406,7 @@ export default function OperatorEwoForm() {
             </select>
 
             <label style={styles.label}>
-              Type of Failure *
+              Skala Kerusakan *
             </label>
 
             <select
@@ -357,7 +417,7 @@ export default function OperatorEwoForm() {
               style={styles.input}
             >
               <option value="">
-                Pilih tipe kerusakan
+                Pilih skala kerusakan
               </option>
 
               <option value="Total">

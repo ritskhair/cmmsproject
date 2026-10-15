@@ -1,0 +1,34 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cmms_backend
+    restart: always
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:khairi33@host.docker.internal:5432/cmmsproject}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:8080}
+      - OPERATOR_ALLOWED_NETWORKS=${OPERATOR_ALLOWED_NETWORKS:-127.0.0.1/32,::1/128,10.23.21.0/24,172.18.0.1/32}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://10.23.21.168:8000}
+    container_name: cmms_frontend
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend

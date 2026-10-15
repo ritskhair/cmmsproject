@@ -32,19 +32,26 @@ def list_ewo_requests(db: Session = Depends(get_db), _=Depends(require_roles(*RE
 
 @router.post("", response_model=EwoRequestResponse, status_code=201)
 def create_ewo_request(payload: EwoRequestCreate, db: Session = Depends(get_db), _=Depends(require_roles(*CREATE_ROLES))):
-    component = db.query(Component).filter(Component.id == payload.component_id).first()
     equipment = db.query(Equipment).filter(Equipment.id == payload.equipment_id, Equipment.section == payload.section.value).first()
-    if component and component.machine_id != payload.equipment_id:
-        component = None
-    if component:
-        equipment = db.query(Equipment).filter(Equipment.id == component.machine_id, Equipment.section == payload.section.value).first()
-    if not component or not equipment:
-        raise HTTPException(status_code=404, detail="Component is not part of the selected machine and section")
+    if not equipment:
+        raise HTTPException(status_code=404, detail="Equipment not found in selected section")
+
+    if payload.component_id is not None:
+        # Standard component validation
+        component = db.query(Component).filter(Component.id == payload.component_id).first()
+        if not component or component.machine_id != payload.equipment_id:
+            raise HTTPException(status_code=404, detail="Component is not part of the selected machine and section")
+    else:
+        # "Other" component — description required
+        if not payload.component_other_description or not payload.component_other_description.strip():
+            raise HTTPException(status_code=422, detail="component_other_description is required when component_id is not provided")
+
     ewo = EwoRequest(ewo_number=next_ewo_number(db), **payload.model_dump())
     db.add(ewo)
     db.commit()
     db.refresh(ewo)
     return ewo
+
 
 
 @router.get("/{ewo_id}", response_model=EwoRequestResponse)
