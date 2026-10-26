@@ -227,8 +227,8 @@ button:hover {
 .dashboard-chart-grid {
   display: grid;
   grid-template-columns:
-    minmax(0, 2fr)
-    minmax(260px, 1fr);
+    minmax(0, 2.5fr)
+    minmax(235px, 0.85fr);
 
   gap: 16px;
   width: 100%;

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from "react";
 
 import { apiRequest, type Equipment } from "../../utils/api";
@@ -43,11 +44,11 @@ export default function WorkOrders() {
 
   useEffect(() => { void loadData(); }, []);
 
-  const equipmentNames = new Map(equipment.map((item) => [item.id, item.name]));
+  const equipmentNames = useMemo(() => new Map(equipment.map((item) => [item.id, item.name])), [equipment]);
   const visibleEwos = useMemo(() => ewos.filter((ewo) => {
     const text = `${ewo.ewo_number} ${ewo.requestor_name} ${equipmentNames.get(ewo.equipment_id) || ""} ${ewo.section}`.toLowerCase();
     return text.includes(search.toLowerCase()) && (!statusFilter || ewo.status === statusFilter);
-  }), [ewos, equipment, search, statusFilter]);
+  }), [ewos, equipmentNames, search, statusFilter]);
 
   async function updateStatus(ewoId: string, status: Ewo["status"]) {
     try {

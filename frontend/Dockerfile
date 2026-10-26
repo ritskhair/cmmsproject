@@ -1,17 +1,17 @@
 # Stage 1: Build the React application
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm ci --fetch-retries=5 --fetch-retry-factor=2 --fetch-retry-mintimeout=1000 --fetch-retry-maxtimeout=120000
 
 # Copy the rest of the application
 COPY . .
 
 # Set API URL during build (can be overridden via build arg)
-ARG VITE_API_BASE_URL=http://localhost:8000
+ARG VITE_API_BASE_URL=/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Build the application

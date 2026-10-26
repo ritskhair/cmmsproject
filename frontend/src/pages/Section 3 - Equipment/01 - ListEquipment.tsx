@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { apiRequest, type Equipment, type Section } from "../../utils/api";
@@ -45,7 +45,7 @@ export default function EquipmentList() {
     });
   }, []);
 
-  async function loadEquipment() {
+  const loadEquipment = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (statusFilter) params.set("status", statusFilter);
@@ -55,11 +55,13 @@ export default function EquipmentList() {
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Equipment gagal dimuat.");
     }
-  }
+  }, [sectionFilter, statusFilter]);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     void loadEquipment();
-  }, [statusFilter, sectionFilter]);
+  }, [loadEquipment]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const filteredEquipment = useMemo(() => {
     const value = search.toLowerCase();

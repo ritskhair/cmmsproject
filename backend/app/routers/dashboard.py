@@ -88,6 +88,7 @@ def get_dashboard_summary(
         .filter(
             EwoRequest.created_at >= dt_from,
             EwoRequest.created_at <= dt_to,
+            EwoRequest.status == "completed",
         )
         .group_by(EwoRequest.section)
         .order_by(func.count(EwoRequest.id).desc())
@@ -95,10 +96,21 @@ def get_dashboard_summary(
     if section:
         pareto_q = pareto_q.filter(EwoRequest.section == section)
 
-    failure_by_section = [
-        FailureBySection(section=row.section, total=row.total)
-        for row in pareto_q.all()
-    ]
+    pareto_rows = pareto_q.all()
+    pareto_total = sum(row.total for row in pareto_rows)
+    cumulative = 0.0
+    failure_by_section = []
+    for row in pareto_rows:
+        percentage = round((row.total / pareto_total) * 100, 1) if pareto_total else 0.0
+        cumulative = round(cumulative + percentage, 1)
+        failure_by_section.append(
+            FailureBySection(
+                section=row.section,
+                total=row.total,
+                percentage=percentage,
+                cumulative_percentage=cumulative,
+            )
+        )
 
     return DashboardSummary(
         mttr_minutes=mttr_minutes,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getLandingPath, saveAuthSession, type UserRole } from "../../utils/auth";
 import { apiRequest, type AccountLoginResponse, type OperatorLoginResponse } from "../../utils/api";
@@ -6,19 +6,10 @@ import { apiRequest, type AccountLoginResponse, type OperatorLoginResponse } fro
 export default function Login() {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => localStorage.getItem("cmmsRememberedEmail") ?? "");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => Boolean(localStorage.getItem("cmmsRememberedEmail")));
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    const rememberedEmail = localStorage.getItem("cmmsRememberedEmail");
-
-    if (rememberedEmail) {
-      setEmail(rememberedEmail);
-      setRememberMe(true);
-    }
-  }, []);
 
   const handleSignIn = async (
   event: React.FormEvent<HTMLFormElement>

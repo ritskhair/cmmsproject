@@ -10,6 +10,8 @@ class EquipmentStatusCount(BaseModel):
 class FailureBySection(BaseModel):
     section: str
     total: int
+    percentage: float
+    cumulative_percentage: float
 
 
 class DashboardSummary(BaseModel):

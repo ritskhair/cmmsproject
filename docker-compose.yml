@@ -25,7 +25,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://10.23.21.168:8000}
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-/api}
     container_name: cmms_frontend
     restart: always
     ports:

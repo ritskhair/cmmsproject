@@ -1,3 +1,5 @@
+import ipaddress
+
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy.orm import Session
 
@@ -18,8 +20,19 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/operator", response_model=OperatorLoginResponse)
-def operator_login(request: Request):
+def operator_login(
+    request: Request,
+    forwarded_client_ip: str | None = Header(default=None, alias="X-Real-IP"),
+):
     client_host = request.client.host if request.client else None
+    if client_host:
+        try:
+            proxy_address = ipaddress.ip_address(client_host)
+            docker_network = ipaddress.ip_network("172.16.0.0/12")
+            if proxy_address in docker_network and forwarded_client_ip:
+                client_host = forwarded_client_ip
+        except ValueError:
+            pass
     if not operator_ip_allowed(client_host):
         raise HTTPException(
             status_code=403,

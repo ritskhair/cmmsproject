@@ -1,4 +1,6 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+// The Docker deployment proxies /api to the backend, keeping browser requests
+// on the same origin as the frontend.
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export class ApiError extends Error {
   status: number;
@@ -109,6 +111,8 @@ export type Component = {
 export type FailureBySection = {
   section: string;
   total: number;
+  percentage: number;
+  cumulative_percentage: number;
 };
 
 export type EquipmentStatusCount = {
@@ -172,4 +176,3 @@ export async function downloadApiFile(path: string, defaultFilename = "download.
   window.URL.revokeObjectURL(url);
   document.body.removeChild(a);
 }
-

@@ -1,5 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type DashboardSummary, type FailureBySection, fetchDashboardSummary } from "../../utils/api";
+import {
+  Bar,
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  Line,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  type TooltipContentProps,
+} from "recharts";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -60,8 +73,79 @@ function KpiCard({ title, value, sub }: { title: string; value: string; sub?: st
   );
 }
 
-function FailureParetoChart({ data }: { data: FailureBySection[] }) {
-  const max = Math.max(...data.map((d) => d.total), 1);
+function FailureParetoChart({
+  data,
+  selectedSection,
+}: {
+  data: FailureBySection[];
+  selectedSection: string;
+}) {
+  type ParetoDatum = {
+    label: string;
+    section: string;
+    total: number;
+    cumulativePercent: number;
+  };
+
+  const { chartData, grandTotal, leftTicks } = useMemo(() => {
+    const sectionList = selectedSection === "all"
+      ? ["1", "2", "3", "4", "5"]
+      : [selectedSection];
+    const sorted = sectionList
+      .map((section) => ({
+        section,
+        total: data.find((item) => item.section === section)?.total ?? 0,
+      }))
+      .sort((a, b) => b.total - a.total || Number(a.section) - Number(b.section));
+    const total = sorted.reduce((sum, item) => sum + item.total, 0);
+    let cumulativeTotal = 0;
+    const points: ParetoDatum[] = [];
+
+    sorted.forEach((item) => {
+      cumulativeTotal += item.total;
+      points.push({
+        label: `S${item.section}`,
+        section: item.section,
+        total: item.total,
+        cumulativePercent: total === 0
+          ? 0
+          : Number(((cumulativeTotal / total) * 100).toFixed(1)),
+      });
+    });
+
+    const tickMaximum = Math.max(total, 1);
+    const ticks = Array.from(
+      { length: 6 },
+      (_, index) => Number(((tickMaximum / 5) * index).toFixed(1)),
+    );
+    return { chartData: points, grandTotal: total, leftTicks: ticks };
+  }, [data, selectedSection]);
+
+  const renderTooltip = ({ active, payload }: TooltipContentProps) => {
+    const item = payload?.find((entry) => {
+      const candidate = entry.payload as ParetoDatum | undefined;
+      return Boolean(candidate?.section);
+    })?.payload as ParetoDatum | undefined;
+    if (!active || !item) return null;
+
+    return (
+      <div
+        style={{
+          padding: "10px 12px",
+          background: colors.white,
+          border: `1px solid ${colors.border}`,
+          borderRadius: "8px",
+          boxShadow: "0 4px 12px rgba(33, 31, 29, 0.12)",
+          color: colors.text,
+          fontSize: "11px",
+        }}
+      >
+        <div style={{ marginBottom: "5px", fontWeight: 700 }}>Section {item.section}</div>
+        <div>Failure: {item.total}</div>
+        <div>Kumulatif: {item.cumulativePercent}%</div>
+      </div>
+    );
+  };
 
   return (
     <div
@@ -79,10 +163,10 @@ function FailureParetoChart({ data }: { data: FailureBySection[] }) {
         Total failure per section dalam periode ini
       </p>
 
-      {data.length === 0 ? (
+      {grandTotal === 0 ? (
         <div
           style={{
-            height: "150px",
+            height: "260px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -93,61 +177,80 @@ function FailureParetoChart({ data }: { data: FailureBySection[] }) {
           Tidak ada data pada periode ini
         </div>
       ) : (
-        <>
-          <div
-            style={{
-              height: "150px",
-              display: "flex",
-              alignItems: "flex-end",
-              gap: "8%",
-              padding: "0 10px",
-              borderBottom: `1px solid ${colors.border}`,
-            }}
+        <ResponsiveContainer width="100%" height={260}>
+          <ComposedChart
+            data={chartData}
+            margin={{ top: 20, right: 10, left: 0, bottom: 0 }}
+            barCategoryGap="12%"
           >
-            {data.map((item) => (
-              <div
-                key={item.section}
-                title={`Section ${item.section}: ${item.total} failures`}
-                style={{
-                  flex: 1,
-                  height: `${(item.total / max) * 140}px`,
-                  background: colors.gold,
-                  borderRadius: "3px 3px 0 0",
-                  position: "relative",
-                  cursor: "default",
-                }}
-              >
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "-18px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    fontSize: "10px",
-                    fontWeight: 700,
-                    color: colors.maroon,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {item.total}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-around",
-              marginTop: "8px",
-              fontSize: "12px",
-              color: colors.secondary,
-            }}
-          >
-            {data.map((item) => (
-              <span key={item.section}>S{item.section}</span>
-            ))}
-          </div>
-        </>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#E8E3DD" />
+            <XAxis
+              dataKey="label"
+              tickLine={false}
+              axisLine={{ stroke: colors.border }}
+              tick={{ fill: colors.secondary, fontSize: 11 }}
+              interval={0}
+              padding={{ left: 0, right: 0 }}
+            />
+            <YAxis
+              yAxisId="left"
+              orientation="left"
+              domain={[0, Math.max(grandTotal, 1)]}
+              ticks={leftTicks}
+              tickFormatter={(value: number) => String(Number(value.toFixed(1)))}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: colors.secondary, fontSize: 11 }}
+              width={40}
+            />
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              domain={[0, 100]}
+              ticks={[0, 20, 40, 60, 80, 100]}
+              tickFormatter={(value: number) => `${value}%`}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: colors.secondary, fontSize: 11 }}
+              width={38}
+            />
+            <Tooltip content={renderTooltip} />
+            <Legend
+              align="right"
+              verticalAlign="top"
+              height={24}
+              iconSize={9}
+              wrapperStyle={{ color: colors.secondary, fontSize: "10px", top: "-4px" }}
+              formatter={(value: string) => value === "total" ? "Failure" : "Kumulatif"}
+            />
+            <ReferenceLine
+              y={80}
+              yAxisId="right"
+              stroke={colors.red}
+              strokeDasharray="5 4"
+              label={{ value: "Batas 80%", position: "insideTopLeft", fill: colors.red, fontSize: 10 }}
+            />
+            <Bar
+              dataKey="total"
+              yAxisId="left"
+              fill={colors.gold}
+              radius={[0, 0, 0, 0]}
+              maxBarSize={90}
+              animationDuration={600}
+              activeBar={{ fillOpacity: 0.75 }}
+            />
+            <Line
+              dataKey="cumulativePercent"
+              yAxisId="right"
+              type="monotone"
+              stroke={colors.maroon}
+              strokeWidth={2.5}
+              dot={{ r: 3, fill: colors.white, stroke: colors.maroon, strokeWidth: 2 }}
+              activeDot={{ r: 4, fill: colors.white, stroke: colors.maroon, strokeWidth: 2 }}
+              animationDuration={600}
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
       )}
     </div>
   );
@@ -282,9 +385,11 @@ export default function MaintenanceDashboard() {
     }
   }, []);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     loadSummary(dateFrom, dateTo, section);
   }, [dateFrom, dateTo, section, loadSummary]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleFilterApply = (from: string, to: string, sec: string) => {
     setDateFrom(from);
@@ -414,7 +519,7 @@ export default function MaintenanceDashboard() {
 
       {/* CHART AND EQUIPMENT STATUS */}
       <section className="dashboard-chart-grid">
-        <FailureParetoChart data={summary?.failure_by_section ?? []} />
+        <FailureParetoChart data={summary?.failure_by_section ?? []} selectedSection={section} />
 
         <div
           style={{
