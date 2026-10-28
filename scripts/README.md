@@ -1,5 +1,17 @@
 # Run modes
 
+## Initial administrator
+
+For a new database, set `INITIAL_ADMIN_USERNAME` and
+`INITIAL_ADMIN_PASSWORD` in the local `.env` file. The backend creates that
+`super_admin` during its first database initialization, only when no
+`super_admin` exists yet. The password is hashed before it is stored.
+
+After the first administrator exists, these variables are ignored by the
+bootstrap check. Create additional users from the application's User
+Management page. Do not commit the local `.env`; only the `.env.example`
+templates belong in Git.
+
 ## Localhost
 
 Open two terminals from the project root:

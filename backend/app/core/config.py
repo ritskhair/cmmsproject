@@ -22,3 +22,11 @@ CORS_ALLOWED_ORIGINS = [
 	).split(",")
 	if origin.strip()
 ]
+
+INITIAL_ADMIN_USERNAME = os.getenv("INITIAL_ADMIN_USERNAME", "").strip()
+INITIAL_ADMIN_PASSWORD = os.getenv("INITIAL_ADMIN_PASSWORD", "")
+
+if bool(INITIAL_ADMIN_USERNAME) != bool(INITIAL_ADMIN_PASSWORD):
+	raise RuntimeError(
+		"INITIAL_ADMIN_USERNAME dan INITIAL_ADMIN_PASSWORD harus diatur bersama-sama."
+	)
