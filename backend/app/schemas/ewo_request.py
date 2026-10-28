@@ -26,12 +26,12 @@ class EwoRequestCreate(BaseModel):
     equipment_id: UUID
     component_id: UUID | None = None
     component_other_description: str | None = None
+    task_catalog_id: UUID | None = None
     shift: str
     team_leader_name: str
     failure_type: FailureType
-    failure_category: FailureCategory
-    task_list: str
-    special_note: str | None = None
+    failure_category: FailureCategory | None = None
+    task_list: str | None = None
 
 
 class EwoRequestUpdate(BaseModel):
@@ -40,13 +40,19 @@ class EwoRequestUpdate(BaseModel):
     department: str | None = None
     equipment_id: UUID | None = None
     component_id: UUID | None = None
+    task_catalog_id: UUID | None = None
     component_other_description: str | None = None
     shift: str | None = None
     team_leader_name: str | None = None
     failure_type: FailureType | None = None
     failure_category: FailureCategory | None = None
     task_list: str | None = None
-    special_note: str | None = None
+
+
+class EwoApprovalUpdate(BaseModel):
+    task_list: str | None = None
+    component_id: UUID | None = None
+    component_other_description: str | None = None
 
 
 class EwoRequestResponse(BaseModel):
@@ -60,11 +66,13 @@ class EwoRequestResponse(BaseModel):
     equipment_id: UUID
     component_id: UUID | None
     component_other_description: str | None
+    task_catalog_id: UUID | None
     shift: str
     team_leader_name: str
     failure_type: FailureType
     failure_category: FailureCategory | None
-    task_list: str
+    task_list: str | None
     special_note: str | None
     status: EwoStatus
     created_at: datetime
+    approved_at: datetime | None

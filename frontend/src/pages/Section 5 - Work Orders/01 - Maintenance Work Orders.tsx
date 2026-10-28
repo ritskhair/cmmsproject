@@ -1,37 +1,35 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from "react";
 
-import { apiRequest, type Equipment } from "../../utils/api";
+import { apiRequest, type Equipment, type EwoRequest } from "../../utils/api";
 
-type Ewo = {
-  id: string;
-  ewo_number: string;
-  requestor_name: string;
-  department: string;
-  equipment_id: string;
-  section: "1" | "2" | "3" | "4" | "5";
-  shift: string;
-  team_leader_name: string;
-  failure_type: "total" | "partial";
-  task_list: string;
-  special_note: string | null;
-  status: "pending" | "in_progress" | "completed";
-  created_at: string;
+type CompletionForm = {
+  condition_after_repair: string;
+  root_cause: string;
+  tools_used: string;
+  failure_category: "electrical" | "mechanical" | "";
 };
 
-const statusLabels = { pending: "Pending", in_progress: "On Progress", completed: "Done" };
+const emptyCompletion: CompletionForm = {
+  condition_after_repair: "",
+  root_cause: "",
+  tools_used: "",
+  failure_category: "",
+};
 
 export default function WorkOrders() {
-  const [ewos, setEwos] = useState<Ewo[]>([]);
+  const [ewos, setEwos] = useState<EwoRequest[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [selected, setSelected] = useState<EwoRequest | null>(null);
+  const [form, setForm] = useState<CompletionForm>(emptyCompletion);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   async function loadData() {
     try {
       const [ewoResult, equipmentResult] = await Promise.all([
-        apiRequest<Ewo[]>("/ewo-requests"),
+        apiRequest<EwoRequest[]>("/ewo-requests"),
         apiRequest<Equipment[]>("/equipment"),
       ]);
       setEwos(ewoResult);
@@ -44,25 +42,99 @@ export default function WorkOrders() {
 
   useEffect(() => { void loadData(); }, []);
 
-  const equipmentNames = useMemo(() => new Map(equipment.map((item) => [item.id, item.name])), [equipment]);
-  const visibleEwos = useMemo(() => ewos.filter((ewo) => {
+  const equipmentNames = useMemo(
+    () => new Map(equipment.map((item) => [item.id, item.name])),
+    [equipment],
+  );
+  const matchesSearch = (ewo: EwoRequest) => {
     const text = `${ewo.ewo_number} ${ewo.requestor_name} ${equipmentNames.get(ewo.equipment_id) || ""} ${ewo.section}`.toLowerCase();
-    return text.includes(search.toLowerCase()) && (!statusFilter || ewo.status === statusFilter);
-  }), [ewos, equipmentNames, search, statusFilter]);
+    return text.includes(search.toLowerCase());
+  };
+  const open = ewos.filter((ewo) => ewo.status === "pending" && matchesSearch(ewo));
+  const completing = ewos.filter((ewo) => ewo.status === "in_progress" && matchesSearch(ewo));
+  const history = ewos.filter((ewo) => ewo.status === "completed" && matchesSearch(ewo));
 
-  async function updateStatus(ewoId: string, status: Ewo["status"]) {
+  function selectForCompletion(ewo: EwoRequest) {
+    setSelected(ewo);
+    setForm(emptyCompletion);
+  }
+
+  async function submitCompletion() {
+    if (!selected || Object.values(form).some((value) => !value.trim())) {
+      setError("Seluruh detail Completing EWO wajib diisi.");
+      return;
+    }
+    setSaving(true);
     try {
-      await apiRequest(`/ewo-requests/${ewoId}/status?status=${status}`, { method: "PATCH" });
+      await apiRequest(`/ewo-requests/${selected.id}/maintenance`, {
+        method: "POST",
+        body: JSON.stringify({
+          ...form,
+        }),
+      });
+      setSelected(null);
+      setForm(emptyCompletion);
       await loadData();
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Status EWO gagal diperbarui.");
+      setError(requestError instanceof Error ? requestError.message : "Detail maintenance gagal disimpan.");
+    } finally {
+      setSaving(false);
     }
   }
 
-  const current = visibleEwos.filter((ewo) => ewo.status !== "completed");
-  const history = visibleEwos.filter((ewo) => ewo.status === "completed");
+  const statusLabel = (status: EwoRequest["status"]) => (
+    status === "pending" ? "Open EWO" : status === "in_progress" ? "Completing EWO" : "History EWO"
+  );
+  const renderRow = (ewo: EwoRequest, action = false) => (
+    <tr key={ewo.id}>
+      <td><strong>{ewo.ewo_number}</strong></td>
+      <td>{ewo.requestor_name}</td>
+      <td>{equipmentNames.get(ewo.equipment_id) || ewo.equipment_id}</td>
+      <td>{ewo.section}</td>
+      <td>{new Date(ewo.created_at).toLocaleString()}</td>
+      <td><span className={`status-badge status-${ewo.status === "completed" ? "done" : "pending"}`}>{statusLabel(ewo.status)}</span></td>
+      {action && <td><button type="button" className="status-select" onClick={() => selectForCompletion(ewo)}>Isi Detail</button></td>}
+    </tr>
+  );
 
-  const renderRow = (ewo: Ewo) => <tr key={ewo.id}><td><strong>{ewo.ewo_number}</strong></td><td>{ewo.requestor_name}</td><td>{equipmentNames.get(ewo.equipment_id) || ewo.equipment_id}</td><td>{ewo.section}</td><td>{new Date(ewo.created_at).toLocaleString()}</td><td><select className="status-select" value={ewo.status} onChange={(event) => void updateStatus(ewo.id, event.target.value as Ewo["status"])}><option value="pending">Pending</option><option value="in_progress">On Progress</option><option value="completed">Done</option></select></td></tr>;
+  return (
+    <div className="work-orders-page work-orders-background">
+      <header className="page-header">
+        <div><h1>Work Orders</h1><p>Open, Completing, dan History Emergency Work Order</p></div>
+        <div className="profile-initial">MT</div>
+      </header>
+      {error && <p className="login-error">{error}</p>}
+      <section className="ewo-kpi-grid">
+        <div className="ewo-kpi-card"><span>Open EWO</span><strong>{open.length}</strong></div>
+        <div className="ewo-kpi-card"><span>Completing EWO</span><strong>{completing.length}</strong></div>
+        <div className="ewo-kpi-card"><span>History EWO</span><strong>{history.length}</strong></div>
+        <div className="ewo-kpi-card"><span>Total</span><strong>{ewos.length}</strong></div>
+      </section>
+      <div className="ewo-toolbar"><input placeholder="Search EWO code, equipment, requestor..." value={search} onChange={(event) => setSearch(event.target.value)} /></div>
 
-  return <div className="work-orders-page"><header className="page-header"><div><h1>Work Orders</h1><p>Monitoring Emergency Work Order</p></div><div className="profile-initial">SA</div></header>{error && <p className="login-error">{error}</p>}<section className="ewo-kpi-grid"><div className="ewo-kpi-card"><span>Total Work Orders</span><strong>{ewos.length}</strong></div><div className="ewo-kpi-card"><span>Pending</span><strong>{ewos.filter((item) => item.status === "pending").length}</strong></div><div className="ewo-kpi-card"><span>On Progress</span><strong>{ewos.filter((item) => item.status === "in_progress").length}</strong></div><div className="ewo-kpi-card"><span>Done</span><strong>{ewos.filter((item) => item.status === "completed").length}</strong></div></section><section className="ewo-section"><div className="section-title"><h2>EWO Saat Ini</h2><p>Daftar EWO yang masih dalam proses penanganan</p></div><div className="ewo-toolbar"><input placeholder="Search EWO code, equipment, requestor..." value={search} onChange={(event) => setSearch(event.target.value)} /><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="">All Status</option><option value="pending">Pending</option><option value="in_progress">On Progress</option><option value="completed">Done</option></select></div><div className="ewo-table-wrapper"><table className="ewo-table"><thead><tr><th>EWO Code</th><th>Requestor</th><th>Equipment</th><th>Section</th><th>Created</th><th>Status</th></tr></thead><tbody>{current.length ? current.map(renderRow) : <tr><td colSpan={6} className="empty-row">Tidak ada EWO aktif.</td></tr>}</tbody></table></div></section><section className="ewo-section"><div className="section-title"><h2>History EWO</h2><p>Daftar EWO yang telah selesai ditangani</p></div><div className="history-list">{history.length ? history.map((ewo) => <div className="history-item" key={ewo.id}><div><strong>{ewo.ewo_number}</strong><p>{equipmentNames.get(ewo.equipment_id) || ewo.equipment_id} — {ewo.requestor_name}</p><small>Section {ewo.section} · {new Date(ewo.created_at).toLocaleString()}</small></div><span className="status-badge status-done">{statusLabels.completed}</span></div>) : <p className="empty-history">Tidak ada history EWO.</p>}</div></section></div>;
+      <section className="ewo-section">
+        <div className="section-title"><h2>Open EWO</h2><p>EWO yang menunggu approval Production.</p></div>
+        <div className="ewo-table-wrapper"><table className="ewo-table"><thead><tr><th>EWO Code</th><th>Requestor</th><th>Equipment</th><th>Section</th><th>Created</th><th>Status</th></tr></thead><tbody>{open.length ? open.map((ewo) => renderRow(ewo)) : <tr><td colSpan={6} className="empty-row">Tidak ada Open EWO.</td></tr>}</tbody></table></div>
+      </section>
+
+      <section className="ewo-section">
+        <div className="section-title"><h2>Completing EWO</h2><p>Maintenance mengisi detail penyelesaian sebelum masuk History.</p></div>
+        <div className="ewo-table-wrapper"><table className="ewo-table"><thead><tr><th>EWO Code</th><th>Requestor</th><th>Equipment</th><th>Section</th><th>Created</th><th>Status</th><th>Action</th></tr></thead><tbody>{completing.length ? completing.map((ewo) => renderRow(ewo, true)) : <tr><td colSpan={7} className="empty-row">Tidak ada Completing EWO.</td></tr>}</tbody></table></div>
+      </section>
+
+      <section className="ewo-section">
+        <div className="section-title"><h2>History EWO</h2><p>EWO completed dan tidak dapat diubah lagi.</p></div>
+        <div className="history-list">{history.length ? history.map((ewo) => <div className="history-item" key={ewo.id}><div><strong>{ewo.ewo_number}</strong><p>{equipmentNames.get(ewo.equipment_id) || ewo.equipment_id} — {ewo.requestor_name}</p><small>Section {ewo.section} · {new Date(ewo.created_at).toLocaleString()}</small></div><span className="status-badge status-done">History EWO</span></div>) : <p className="empty-history">Tidak ada History EWO.</p>}</div>
+      </section>
+
+      {selected && <div className="ewo-modal-backdrop"><section className="ewo-completion-modal"><h2>Completing {selected.ewo_number}</h2><p>{equipmentNames.get(selected.equipment_id) || selected.equipment_id}</p><div className="operator-detail-grid">
+        <label>Failure Category<select value={form.failure_category} onChange={(event) => setForm({ ...form, failure_category: event.target.value as CompletionForm["failure_category"] })}><option value="">Pilih kategori</option><option value="electrical">Electrical</option><option value="mechanical">Mechanical</option></select></label>
+      </div>
+      <label>Root Cause<textarea rows={4} value={form.root_cause} onChange={(event) => setForm({ ...form, root_cause: event.target.value })} /></label>
+      <label>Tools Used<textarea rows={4} value={form.tools_used} onChange={(event) => setForm({ ...form, tools_used: event.target.value })} /></label>
+      <label>Condition After Repair<textarea rows={3} value={form.condition_after_repair} onChange={(event) => setForm({ ...form, condition_after_repair: event.target.value })} /></label>
+      <div className="operator-choice-actions"><button type="button" className="operator-choice-button operator-choice-secondary" onClick={() => setSelected(null)}>Cancel</button><button type="button" className="operator-choice-button operator-choice-primary" disabled={saving} onClick={() => void submitCompletion()}>{saving ? "Menyimpan..." : "Simpan ke History"}</button></div>
+      </section></div>}
+    </div>
+  );
 }

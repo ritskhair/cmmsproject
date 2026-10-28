@@ -1601,6 +1601,245 @@ tbody tr:nth-child(even) {
   padding: 28px 16px;
 }
 
+.work-orders-background {
+  position: relative;
+  isolation: isolate;
+  background-color: #f7f3ed;
+  background-image:
+    linear-gradient(rgba(247, 243, 237, 0.88), rgba(247, 243, 237, 0.94)),
+    url("/work-orders-background.png");
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.operator-main.work-orders-background {
+  min-height: calc(100vh - 64px);
+}
+
+.operator-request-page,
+.work-orders-page {
+  min-height: 100vh;
+  background: transparent;
+}
+
+.operator-choice-page,
+.operator-approval-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.operator-choice-card {
+  max-width: 680px;
+  margin: 72px auto;
+  padding: 44px;
+  background: #fff;
+  border: 1px solid #d6d1c9;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(58, 42, 30, 0.08);
+}
+
+.operator-eyebrow {
+  margin: 0 0 8px;
+  color: #681813;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.operator-choice-card h1,
+.operator-page-heading h1 {
+  margin: 0;
+  color: #2f2924;
+}
+
+.operator-choice-description,
+.operator-page-heading p {
+  color: #6f6963;
+}
+
+.operator-choice-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 30px;
+}
+
+.operator-choice-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.operator-choice-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.operator-choice-primary {
+  color: #fff;
+  background: #681813;
+}
+
+.operator-choice-secondary {
+  color: #681813;
+  background: #f3ead1;
+}
+
+.operator-approval-grid {
+  display: grid;
+  grid-template-columns: minmax(270px, 0.8fr) minmax(0, 1.6fr);
+  gap: 20px;
+  margin-top: 26px;
+}
+
+.operator-approval-list,
+.operator-approval-detail {
+  padding: 22px;
+  background: #fff;
+  border: 1px solid #d6d1c9;
+  border-radius: 12px;
+}
+
+.operator-approval-list h2,
+.operator-approval-detail h2 {
+  margin-top: 0;
+  color: #332c27;
+}
+
+.operator-approval-item {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid #e8e3dd;
+  border-radius: 9px;
+  color: #332c27;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.operator-approval-item.active {
+  border-color: #681813;
+  box-shadow: inset 3px 0 #681813;
+}
+
+.operator-approval-item span,
+.operator-approval-item small,
+.operator-detail-muted {
+  color: #746d66;
+}
+
+.operator-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.operator-approval-detail label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0;
+  color: #4a423b;
+  font-weight: 600;
+}
+
+.operator-approval-detail input,
+.operator-approval-detail select,
+.operator-approval-detail textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d6d1c9;
+  border-radius: 7px;
+  font: inherit;
+  font-weight: 400;
+}
+
+.operator-approval-empty {
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  color: #746d66;
+}
+
+.ewo-modal-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(37, 28, 22, 0.45);
+}
+
+.ewo-completion-modal {
+  width: min(720px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 28px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(37, 28, 22, 0.24);
+}
+
+.ewo-completion-modal h2 {
+  margin: 0;
+  color: #332c27;
+}
+
+.ewo-completion-modal > p {
+  color: #746d66;
+}
+
+.ewo-completion-modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0;
+  color: #4a423b;
+  font-weight: 600;
+}
+
+.ewo-completion-modal input,
+.ewo-completion-modal select,
+.ewo-completion-modal textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d6d1c9;
+  border-radius: 7px;
+  font: inherit;
+  font-weight: 400;
+}
+
+@media (max-width: 760px) {
+  .operator-choice-actions,
+  .operator-approval-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .operator-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 600px) {
   .operator-header {
     padding: 0 18px;

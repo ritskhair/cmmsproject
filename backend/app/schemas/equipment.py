@@ -80,10 +80,32 @@ class ComponentResponse(BaseModel):
     asset_id: str | None = None
 
 
+class EquipmentTaskCatalogResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    equipment_id: UUID
+    task_list: str
+    active: bool
+    review_status: str
+    source: str
+    created_at: datetime
+
+
+class TaskCatalogImportSummary(BaseModel):
+    success: bool
+    total_created: int
+    errors: list[str] = []
+
+
+class TaskCatalogReviewUpdate(BaseModel):
+    review_status: Literal["approved", "rejected"]
+    active: bool = True
+
+
 class EquipmentImportSummary(BaseModel):
     success: bool
     total_equipment_created: int
     total_equipment_updated: int
     total_components_added: int
     errors: list[str] = []
-

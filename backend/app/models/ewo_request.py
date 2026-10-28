@@ -18,6 +18,7 @@ class EwoRequest(Base):
     section = Column(String(10), nullable=False)
     equipment_id = Column(UUID(as_uuid=True), ForeignKey("equipment.id"), nullable=False)
     component_id = Column(UUID(as_uuid=True), ForeignKey("components.id"), nullable=True)
+    task_catalog_id = Column(UUID(as_uuid=True), ForeignKey("equipment_task_catalog.id"), nullable=True)
     component_other_description = Column(Text, nullable=True)
     shift = Column(String(50), nullable=False)
     team_leader_name = Column(String(150), nullable=False)
@@ -27,6 +28,7 @@ class EwoRequest(Base):
     special_note = Column(Text, nullable=True)
     status = Column(String(20), default="pending", nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    approved_at = Column(DateTime, nullable=True)
 
     equipment = relationship("Equipment")
     component = relationship("Component")

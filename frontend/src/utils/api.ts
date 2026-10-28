@@ -108,6 +108,57 @@ export type Component = {
   created_at: string;
 };
 
+export type EquipmentTaskCatalog = {
+  id: string;
+  equipment_id: string;
+  task_list: string;
+  active: boolean;
+  review_status: string;
+  source: string;
+  created_at: string;
+};
+
+export type EwoRequest = {
+  id: string;
+  ewo_number: string;
+  requestor_name: string;
+  department: string;
+  equipment_id: string;
+  component_id: string | null;
+  component_other_description: string | null;
+  task_catalog_id: string | null;
+  section: "1" | "2" | "3" | "4" | "5";
+  shift: string;
+  team_leader_name: string;
+  failure_type: "total" | "partial";
+  failure_category: "electrical" | "mechanical" | null;
+  task_list: string | null;
+  special_note: string | null;
+  status: "pending" | "in_progress" | "completed";
+  created_at: string;
+  approved_at: string | null;
+};
+
+export type EwoMaintenance = {
+  id: string;
+  ewo_request_id: string;
+  code_approval: string;
+  start_time: string;
+  end_time: string;
+  condition_after_repair: string;
+  root_cause: string | null;
+  tools_used: string | null;
+  failure_type: "total" | "partial" | null;
+  failure_category: "electrical" | "mechanical" | null;
+  created_at: string;
+};
+
+export type TaskCatalogImportSummary = {
+  success: boolean;
+  total_created: number;
+  errors: string[];
+};
+
 export type FailureBySection = {
   section: string;
   total: number;

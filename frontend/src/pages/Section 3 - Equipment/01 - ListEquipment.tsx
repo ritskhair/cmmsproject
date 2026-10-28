@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { apiRequest, type Equipment, type Section } from "../../utils/api";
-import { getAuthSession } from "../../utils/auth";
+import { getAuthSession, isOperatorRole } from "../../utils/auth";
 import ImportEquipmentModal from "./ImportEquipmentModal";
+import TaskCatalogImportModal from "./TaskCatalogImportModal";
 
 const statuses = ["Operational", "Warning", "Critical"] as const;
 
@@ -27,6 +28,7 @@ export default function EquipmentList() {
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isTaskCatalogModalOpen, setIsTaskCatalogModalOpen] = useState(false);
   const [form, setForm] = useState<EquipmentForm>({
     asset_id: "",
     name: "",
@@ -97,6 +99,15 @@ export default function EquipmentList() {
             📊 Import Excel
           </button>
         )}
+        {!isOperatorRole(authSession?.role) && (
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() => setIsTaskCatalogModalOpen(true)}
+          >
+            Import Task List
+          </button>
+        )}
         <button type="button" className="primary-button" onClick={() => setShowForm((value) => !value)}>Add Equipment</button>
       </section>
       {showForm && <section className="equipment-form-card"><div className="equipment-form-header"><div><h2>Add Equipment</h2><p>Register a machine under a section.</p></div><button type="button" className="secondary-button" onClick={() => setShowForm(false)}>Cancel</button></div><div className="equipment-form-grid"><div className="filter-group"><label htmlFor="add-equipment-asset-id">Asset ID</label><input id="add-equipment-asset-id" placeholder="e.g. MCH-001" value={form.asset_id} onChange={(event) => setForm({ ...form, asset_id: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-name">Machine name</label><input id="add-equipment-name" placeholder="e.g. Pellet Mill 01" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-type">Machine type</label><input id="add-equipment-type" placeholder="e.g. Motor" value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-section">Section</label><select id="add-equipment-section" value={form.section} onChange={(event) => setForm({ ...form, section: event.target.value })}>{sections.map((section) => <option key={section.code} value={section.code}>{section.name}</option>)}</select></div></div><div className="equipment-form-actions"><button type="button" className="primary-button" onClick={() => void addEquipment()}>Save Equipment</button></div></section>}
@@ -111,7 +122,10 @@ export default function EquipmentList() {
         onClose={() => setIsImportModalOpen(false)}
         onSuccess={() => void loadEquipment()}
       />
+      <TaskCatalogImportModal
+        isOpen={isTaskCatalogModalOpen}
+        onClose={() => setIsTaskCatalogModalOpen(false)}
+      />
     </div>
   );
 }
-

@@ -1,0 +1,76 @@
+﻿,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+Section,Machine,Priority,,Section,Machine,Priority,,Section,Machine,Priority,,Section,Machine,Priority,,Section,Machine,Priority
+1,Log Shaft Debarker 1,2,,2,Hydraulic Wet Wood Chip Silo 1A,2,,3,Screw Conveyor WSDS A,2,,4,Plough Type DHM - 1,2,,5,Bucket Conveyor Pelletizer Line 1,2
+1,Skin Picking Conveyor 1,2,,2,Hydraulic Wet Wood Chip Silo 1B,2,,3,Screw Conveyor WSDS B,2,,4,Screw Buffer Silo to DHM - 1,2,,5,Screw Conveyor Bin Silo Pelletizer Line 1,2
+1,Infeed Log Chipper 1 #1,2,,2,Hydraulic Wet Wood Chip Silo 2A,2,,3,Screw Conveyor WSDS 1,2,,4,Dry Hammer Mill - 1,2,,5,Pre-Conditioner Line 1,2
+1,Infeed Log Chipper 1 #2,2,,2,Hydraulic Wet Wood Chip Silo 2B,2,,3,Screw Conveyor WSDS 2,2,,4,Plough Type DHM - 2,2,,5,Rippening Mixer Line 1,2
+1,Log Chipper 1,2,,2,Screw Conveyor WWCS 1,2,,3,Input Conveyor Dryer 1,2,,4,Screw Buffer Silo to DHM - 2,2,,5,Screw Feeder 1A,2
+1,Output Log Chipper 1,2,,2,Screw Conveyor WWCS 2,2,,3,Dryer 1,2,,4,Dry Hammer Mill - 2,2,,5,Conditioner Pelletizer 1A,2
+1,Log Shaft Debarker 2,2,,2,Discharge Conveyor 1,1,,3,Heat Center 1,1,,4,Plough Type DHM - 3,2,,5,Pelletizer Machine 1A,2
+1,Skin Picking Conveyor 2,2,,2,Elektromagnetik,2,,3,ID Fan Chimney 1,1,,4,Screw Buffer Silo to DHM - 3,2,,5,Screw Feeder 1B,2
+1,Infeed Log Chipper 2,2,,2,S-Trip Conveyor WHM,1,,3,Wet Scrubber 1 CHY01,3,,4,Dry Hammer Mill - 3,2,,5,Conditioner Pelletizer 1B,2
+1,Log Chipper 2,2,,2,Distributed Conveyor WHM,1,,3,Wet Scrubber 2 CHY01,3,,4,Screw Buffer Silo to DHM - 4,2,,5,Pelletizer Machine 1B,2
+1,Output Log Chipper 2,2,,2,Plough Type WHM 1,2,,3,Wet Scrubber 3 CHY01,3,,4,Dry Hammer Mill - 4,2,,5,Screw Feeder 1C,2
+1,Barks Conveyor,2,,2,Screw Buffer Silo to WHM 1,2,,3,Wet Scrubber 4 CHY01,3,,4,Scrapper Output DHM Conveyor,1,,5,Conditioner Pelletizer 1C,2
+1,Input Veneer Chipper 1,2,,2,Wet Hammer Mill 1,2,,3,Wet Scrubber 5 CHY01,3,,4,Mettler Toledo,1,,5,Pelletizer Machine 1C,2
+1,Veneer Chipper 1,2,,2,Plough Type WHM 2,2,,3,Wet Scrubber 6 CHY01,3,,4,Scrapper Output Mettler Toledo Conveyor,1,,5,Bucket Conveyor Pelletizer Line 2,2
+1,Output Veneer Chipper 1,2,,2,Screw Buffer Silo to WHM 2,2,,3,Scrapper Output Conveyor Dryer 1,2,,4,Screw Conveyor to Bucket,1,,5,Screw Conveyor Bin Silo Pelletizer Line 2,2
+1,Input Veneer Chipper 2,2,,2,Wet Hammer Mill 2,2,,3,Screw Conveyor WSDS C,2,,4,Bucket Conveyor DFDS,1,,5,Pre-Conditioner Line 2,2
+1,Veneer Chipper 2,2,,2,Plough Type WHM 3,2,,3,Screw Conveyor WSDS D,2,,4,Scrapper Input DFDS,1,,5,Rippening Mixer Line 2,2
+1,Output Veneer Chipper 2,2,,2,Screw Buffer Silo to WHM 3,2,,3,Input Conveyor Dryer 2,2,,4,Powerpack DFDS 1,2,,5,Screw Feeder 2B,2
+1,Plough Type 1 WWCS,2,,2,Wet Hammer Mill 3,2,,3,Dryer 2,2,,4,Sensor Level High DFDS 1,3,,5,Conditioner Pelletizer 2B,2
+1,Plough Type 2 WWCS,2,,2,Plough Type WHM 4,2,,3,Heat Center 2,1,,4,Sensor Level Middle DFDS 1,3,,5,Pelletizer Machine 2B,2
+1,Plough Type 3 WWCS,2,,2,Screw Buffer Silo to WHM 4,2,,3,ID Fan Chimney 2,1,,4,Sensor Level Low DFDS 1,3,,5,Screw Feeder 2C,2
+1,Distributed Conveyor WWCS,1,,2,Wet Hammer Mill 4,2,,3,Wet Scrubber 1 CHY02,3,,4,Screw Conveyor DFDS 1,2,,5,Conditioner Pelletizer 2C,2
+1,Screw Conveyor Dumping Station,3,,2,Plough Type WHM 5,2,,3,Wet Scrubber 2 CHY02,3,,4,Powerpack DFDS 2,2,,5,Pelletizer Machine 2C,2
+1,Bucket Elevator Dumping Station,3,,2,Screw Buffer Silo to WHM 5,2,,3,Wet Scrubber 3 CHY02,3,,4,Sensor Level High DFDS 2,2,,5,Bucket Conveyor Pelletizer Line 3,2
+,,,,2,Wet Hammer Mill 5,2,,3,Wet Scrubber 4 CHY02,3,,4,Sensor Level Middle DFDS 2,2,,5,Screw Conveyor Bin Silo Pelletizer Line 3,2
+,,,,2,Plough Type WHM 6,2,,3,Wet Scrubber 5 CHY02,3,,4,Sensor Level Low DFDS 2,2,,5,Pre-Conditioner Line 3,2
+,,,,2,Screw Buffer Silo to WHM 6,2,,3,Wet Scrubber 6 CHY02,3,,4,Screw Conveyor DFDS 2/,2,,5,Rippening Mixer Line 3,2
+,,,,2,Wet Hammer Mill 6,2,,3,Scrapper Output Conveyor Dryer 2,2,,4,Powerpack DFDS 3,2,,5,Screw Feeder 3A,2
+,,,,2,Screw Buffer Silo to WHM 7,2,,3,Scrapper Collecting Output Dryer Conveyor,1,,4,Sensor Level High DFDS 3,2,,5,Conditioner Pelletizer 3A,2
+,,,,2,Wet Hammer Mill 7,2,,3,Distributed Conveyor DHM,1,,4,Sensor Level Middle DFDS 3,2,,5,Pelletizer Machine 3A,2
+,,,,2,Scrapper Output Conveyor WHM,1,,3,Input Conveyor Fuel Chipper 1,1,,4,Sensor Level Low DFDS 3,2,,5,Screw Feeder 3B,2
+,,,,2,Sensor Level High WSDS,2,,3,Fuel Chipper 1,1,,4,Screw Conveyor DFDS 3,2,,5,Conditioner Pelletizer 3B,2
+,,,,2,Sensor Level Middle WSDS,2,,3,Output Conveyor Fuel Chipper 1,1,,4,Powerpack DFDS 4,2,,5,Pelletizer Machine 3B,2
+,,,,2,Sensor Level Low WSDS,2,,3,Input Conveyor Fuel Chipper 2,1,,4,Sensor Level High DFDS 4,2,,5,Output Conveyor Pelletizer Line 1,2
+,,,,2,Wet Sawdust Silo,1,,3,Fuel Chipper 2,1,,4,Sensor Level Middle DFDS 4,2,,5,S-Trip Conveyor Cooling Line 1,2
+,,,,2,Dust Collector Wet Hammer Mill,3,,3,Output Conveyor Fuel Chipper 2,1,,4,Sensor Level Low DFDS 4,2,,5,Output Conveyor Pelletizer Line 2,2
+,,,,,,,,3,Bin Silo Fuel Chipper 1,1,,4,Screw Conveyor DFDS 4,2,,5,S-Trip Conveyor Cooling Line 2,2
+,,,,,,,,3,Screw Output Conveyor Fuel Chipper 1,1,,4,Scrapper Output DFDS Conveyor,1,,5,Output Conveyor Pelletizer Line 3,2
+,,,,,,,,3,Belt Conveyor Output Bin Silo FC 1,1,,4,Scrapper Input Pelletizer Conveyor,1,,5,S-Trip Conveyor Cooling Line 3,2
+,,,,,,,,3,S - Trip Conveyor Input Heat Center 1,1,,4,Distributed Belt Conveyor Pelletizer,1,,5,Blower Cooling 1,2
+,,,,,,,,3,Bin Silo Fuel Chipper 2,1,,4,Dust Collector Dry Hammer Mill,3,,5,Cooling Machine 1,2
+,,,,,,,,3,Screw Output Conveyor Fuel Chipper 2,1,,,,,,5,Blower Cooling 2,2
+,,,,,,,,3,Belt Conveyor Output Bin Silo FC 2,1,,,,,,5,Cooling Machine 2,2
+,,,,,,,,3,S - Trip Conveyor Input Heat Center 2,1,,,,,,5,Blower Cooling 3,2
+,,,,,,,,,,,,,,,,5,Cooling Machine 3,2
+,,,,,,,,keterangan: yang merah itu sudah tidak digunakan lagi ,,,,,,,,5,Output Conveyor Cooling Machine 1,2
+,,,,,,,,,,,,,,,,5,S - Trip Conveyor Packing Machine 1,2
+,,,,,,,,,,,,,,,,5,Output Conveyor Cooling Machine 2,2
+,,,,,,,,,,,,,,,,5,S - Trip Conveyor Packing Machine 2,2
+,,,,,,,,,,,,,,,,5,Output Conveyor Cooling Machine 3,2
+,,,,,,,,,,,,,,,,5,S - Trip Conveyor Packing Machine 3,2
+,,,,,,,,,,,,,,,,5,Packing Machine 1,2
+,,,,,,,,,,,,,,,,5,Output Conveyor Packing Machine 1,2
+,,,,,,,,,,,,,,,,5,Packing Machine 2,2
+,,,,,,,,,,,,,,,,5,Output Conveyor Packing Machine 2,2
+,,,,,,,,,,,,,,,,5,Packing Machine 3,2
+,,,,,,,,,,,,,,,,5,Output Conveyor Packing Machine 3,2
+,,,,,,,,,,,,,,,,5,Penggantian Dies 1A,2
+,,,,,,,,,,,,,,,,5,Penggantian Dies 1B,2
+,,,,,,,,,,,,,,,,5,Penggantian Dies 1C,2
+,,,,,,,,,,,,,,,,5,Penggantian Dies 2B,2
+,,,,,,,,,,,,,,,,5,Penggantian Dies 2C,2
+,,,,,,,,,,,,,,,,5,Penggantian Dies 3A,2
+,,,,,,,,,,,,,,,,5,Penggantian Dies 3B,2
+,,,,,,,,,,,,,,,,5,Airlock Cyclone Dryer 1A,3
+,,,,,,,,,,,,,,,,5,Airlock Cyclone Dryer 1B,3
+,,,,,,,,,,,,,,,,5,Airlock Cyclone Dryer 1C,3
+,,,,,,,,,,,,,,,,5,Airlock Cyclone Dryer 1D,3
+,,,,,,,,,,,,,,,,5,Airlock Cyclone Dryer 2A,3
+,,,,,,,,,,,,,,,,5,Airlock Cyclone Dryer 2A,3
+,,,,,,,,,,,,,,,,5,Airlock Cyclone Dryer 2C,3
+,,,,,,,,,,,,,,,,5,Airlock Cyclone Dryer 2D,3

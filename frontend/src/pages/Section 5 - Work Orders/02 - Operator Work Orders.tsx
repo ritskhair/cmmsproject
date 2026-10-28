@@ -6,7 +6,7 @@ import {
 } from "react";
 
 import { useNavigate } from "react-router-dom";
-import { apiRequest, type Component, type Equipment, type Section } from "../../utils/api";
+import { apiRequest, type Component, type Equipment, type EquipmentTaskCatalog, type Section } from "../../utils/api";
 
 export default function OperatorEwoForm() {
   const navigate = useNavigate();
@@ -24,9 +24,10 @@ export default function OperatorEwoForm() {
   const [teamLeader, setTeamLeader] = useState("");
   const [shift, setShift] = useState("");
   const [failureType, setFailureType] = useState("");
-  const [failureCategory, setFailureCategory] = useState("");
   const [taskList, setTaskList] = useState("");
-  const [specialNote, setSpecialNote] = useState("");
+  const [taskCatalogId, setTaskCatalogId] = useState("");
+  const [taskOptions, setTaskOptions] = useState<EquipmentTaskCatalog[]>([]);
+  const [isOtherTask, setIsOtherTask] = useState(false);
 
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -61,6 +62,10 @@ export default function OperatorEwoForm() {
     setEquipmentId("");
     setComponentId("");
     setComponentOptions([]);
+    setTaskCatalogId("");
+    setTaskList("");
+    setTaskOptions([]);
+    setIsOtherTask(false);
     apiRequest<Equipment[]>(`/equipment/sections/${sectionId}/machines`)
       .then((equipment) => { if (active) setEquipmentOptions(equipment); })
       .catch((requestError) => { if (active) setError(requestError instanceof Error ? requestError.message : "Machine gagal dimuat."); })
@@ -77,6 +82,17 @@ export default function OperatorEwoForm() {
       .then((components) => { if (active) setComponentOptions(components); })
       .catch((requestError) => { if (active) setError(requestError instanceof Error ? requestError.message : "Component gagal dimuat."); })
       .finally(() => { if (active) setLoadingComponents(false); });
+    return () => { active = false; };
+  }, [equipmentId]);
+
+  useEffect(() => {
+    if (!equipmentId) return;
+    let active = true;
+    apiRequest<EquipmentTaskCatalog[]>(`/equipment/machines/${equipmentId}/task-catalog`)
+      .then((tasks) => { if (active) setTaskOptions(tasks); })
+      .catch((requestError) => {
+        if (active) setError(requestError instanceof Error ? requestError.message : "Task list gagal dimuat.");
+      });
     return () => { active = false; };
   }, [equipmentId]);
 
@@ -111,7 +127,6 @@ export default function OperatorEwoForm() {
       !teamLeader ||
       !shift ||
       !failureType ||
-      !failureCategory ||
       !taskList
     ) {
       setError(
@@ -134,9 +149,8 @@ export default function OperatorEwoForm() {
           shift,
           team_leader_name: teamLeader,
           failure_type: failureType === "Total" ? "total" : "partial",
-          failure_category: failureCategory,
-          task_list: taskList,
-          special_note: specialNote || null,
+          task_catalog_id: taskCatalogId || null,
+          task_list: taskList || null,
         }),
       });
       setError("");
@@ -173,7 +187,7 @@ export default function OperatorEwoForm() {
   }
 
   return (
-    <div style={styles.page}>
+    <div className="operator-request-page" style={styles.page}>
       <header style={styles.header}>
         <h1 style={styles.logo}>
           ENGINEERING & MAINTENANCE
@@ -340,16 +354,6 @@ export default function OperatorEwoForm() {
               </>
             )}
 
-            <label style={styles.label}>Type of Failure *</label>
-            <select
-              value={failureCategory}
-              onChange={(event) => setFailureCategory(event.target.value)}
-              style={styles.input}
-            >
-              <option value="">Pilih tipe kerusakan</option>
-              <option value="electrical">Electrical</option>
-              <option value="mechanical">Mechanical</option>
-            </select>
           </section>
 
           <section style={styles.card}>
@@ -434,29 +438,41 @@ export default function OperatorEwoForm() {
               Task List *
             </label>
 
-            <textarea
-              value={taskList}
-              onChange={(event) =>
-                setTaskList(event.target.value)
-              }
-              placeholder="Jelaskan masalah atau pekerjaan yang diperlukan"
-              rows={5}
-              style={styles.textarea}
-            />
+            <select
+              value={isOtherTask ? "__other__" : taskCatalogId}
+              onChange={(event) => {
+                const value = event.target.value;
+                const other = value === "__other__";
+                setIsOtherTask(other);
+                setTaskCatalogId(other ? "" : value);
+                setTaskList(value === "__other__"
+                  ? ""
+                  : taskOptions.find((item) => item.id === value)?.task_list ?? "");
+              }}
+              style={styles.input}
+              disabled={!equipmentId}
+            >
+              <option value="">
+                {!equipmentId ? "Pilih machine terlebih dahulu" : "Pilih task list"}
+              </option>
+              {taskOptions.map((item) => (
+                <option key={item.id} value={item.id}>{item.task_list}</option>
+              ))}
+              <option value="__other__">Others (Lainnya)</option>
+            </select>
 
-            <label style={styles.label}>
-              Special Note
-            </label>
-
-            <textarea
-              value={specialNote}
-              onChange={(event) =>
-                setSpecialNote(event.target.value)
-              }
-              placeholder="Tambahkan catatan khusus atau safety issue"
-              rows={4}
-              style={styles.textarea}
-            />
+            {isOtherTask && (
+              <>
+                <label style={styles.label}>Task Manual *</label>
+                <textarea
+                  value={taskList}
+                  onChange={(event) => setTaskList(event.target.value)}
+                  placeholder="Jelaskan masalah atau pekerjaan yang diperlukan"
+                  rows={4}
+                  style={styles.textarea}
+                />
+              </>
+            )}
           </section>
 
           {error && (

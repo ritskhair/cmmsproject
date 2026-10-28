@@ -13,10 +13,14 @@ class EwoMaintenance(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     ewo_request_id = Column(UUID(as_uuid=True), ForeignKey("ewo_requests.id"), nullable=False)
-    code_approval = Column(String(100), nullable=False)
-    start_time = Column(DateTime, nullable=False)
-    end_time = Column(DateTime, nullable=False)
+    code_approval = Column(String(100), nullable=True)
+    start_time = Column(DateTime, nullable=True)
+    end_time = Column(DateTime, nullable=True)
     condition_after_repair = Column(Text, nullable=False)
+    root_cause = Column(Text, nullable=True)
+    tools_used = Column(Text, nullable=True)
+    failure_type = Column(String(20), nullable=True)
+    failure_category = Column(String(20), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     ewo_request = relationship("EwoRequest", back_populates="maintenance")

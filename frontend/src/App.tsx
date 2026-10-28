@@ -6,6 +6,8 @@ import EquipmentList from "./pages/Section 3 - Equipment/01 - ListEquipment";
 import EquipmentDetail from "./pages/Section 3 - Equipment/02 - DetailEquipment";
 import WorkOrders from "./pages/Section 5 - Work Orders/01 - Maintenance Work Orders";
 import OperatorWorkOrders from "./pages/Section 5 - Work Orders/02 - Operator Work Orders";
+import OperatorChoice from "./pages/Section 5 - Work Orders/00 - Operator Choice";
+import OperatorApproval from "./pages/Section 5 - Work Orders/03 - Operator Approval";
 import UserManagement from "./pages/Section 4 - User Management/01 - User Management";
 
 import DashboardLayout from "./component/DashboardLayout";
@@ -25,9 +27,11 @@ export default function App() {
         <Route element={<RequireOperator />}>
           <Route element={<OperatorLayout />}>
             <Route
-              path="/operator/work-orders"
-              element={<OperatorWorkOrders />}
+              path="/operator"
+              element={<OperatorChoice />}
             />
+            <Route path="/operator/request" element={<OperatorWorkOrders />} />
+            <Route path="/operator/approve" element={<OperatorApproval />} />
           </Route>
         </Route>
 

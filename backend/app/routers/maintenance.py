@@ -1,7 +1,6 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -22,25 +21,20 @@ def create_maintenance(
     db: Session = Depends(get_db),
     _=Depends(require_roles(*MAINTENANCE_ROLES)),
 ):
-    if payload.end_time < payload.start_time:
-        raise HTTPException(status_code=422, detail="end_time must be after start_time")
     ewo = db.query(EwoRequest).filter(EwoRequest.id == ewo_id).first()
     if not ewo:
         raise HTTPException(status_code=404, detail="EWO request not found")
+    if ewo.status != "in_progress":
+        raise HTTPException(status_code=409, detail="EWO harus berada di Completing EWO sebelum diselesaikan")
+    if not payload.root_cause.strip() or not payload.tools_used.strip():
+        raise HTTPException(status_code=422, detail="Root cause dan tools used wajib diisi")
+
+    if not payload.condition_after_repair.strip():
+        raise HTTPException(status_code=422, detail="Condition after repair wajib diisi")
 
     maintenance = EwoMaintenance(ewo_request_id=ewo.id, **payload.model_dump())
     db.add(maintenance)
     ewo.status = "completed"
-    db.flush()
-
-    latest_end = (
-        db.query(func.max(EwoMaintenance.end_time))
-        .join(EwoRequest, EwoRequest.id == EwoMaintenance.ewo_request_id)
-        .filter(EwoRequest.equipment_id == ewo.equipment_id)
-        .scalar()
-    )
-    equipment = db.query(Equipment).filter(Equipment.id == ewo.equipment_id).first()
-    equipment.last_pm = latest_end
     db.commit()
     db.refresh(maintenance)
     return maintenance

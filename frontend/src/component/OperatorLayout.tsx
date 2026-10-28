@@ -34,7 +34,7 @@ export default function OperatorLayout() {
         </div>
       </header>
 
-      <main className="operator-main">
+      <main className="operator-main work-orders-background">
         <Outlet />
       </main>
     </div>

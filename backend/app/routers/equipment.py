@@ -13,6 +13,7 @@ from app.core.database import get_db
 from app.core.security import get_current_account, require_roles
 from app.models.component import Component
 from app.models.equipment import Equipment
+from app.models.equipment_task import EquipmentTaskCatalog
 from app.models.section import Section as SectionModel
 from app.schemas.equipment import (
     ComponentCreate,
@@ -24,6 +25,9 @@ from app.schemas.equipment import (
     EquipmentStatus,
     EquipmentUpdate,
     SectionResponse,
+    EquipmentTaskCatalogResponse,
+    TaskCatalogImportSummary,
+    TaskCatalogReviewUpdate,
 )
 
 router = APIRouter(prefix="/equipment", tags=["equipment"])
@@ -58,6 +62,108 @@ def list_machine_components(
     if not db.query(Equipment).filter(Equipment.id == machine_id).first():
         raise HTTPException(status_code=404, detail="Machine not found")
     return db.query(Component).filter(Component.machine_id == machine_id).order_by(Component.created_at.desc()).all()
+
+
+@router.get("/machines/{machine_id}/task-catalog", response_model=list[EquipmentTaskCatalogResponse])
+def list_machine_task_catalog(
+    machine_id: UUID,
+    db: Session = Depends(get_db),
+    _=Depends(require_roles(*HIERARCHY_READ_ROLES)),
+):
+    if not db.query(Equipment).filter(Equipment.id == machine_id).first():
+        raise HTTPException(status_code=404, detail="Machine not found")
+    return (
+        db.query(EquipmentTaskCatalog)
+        .filter(
+            EquipmentTaskCatalog.equipment_id == machine_id,
+            EquipmentTaskCatalog.active.is_(True),
+            EquipmentTaskCatalog.review_status == "approved",
+        )
+        .order_by(EquipmentTaskCatalog.task_list)
+        .all()
+    )
+
+
+@router.post("/task-catalog/import", response_model=TaskCatalogImportSummary)
+def import_task_catalog(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    _=Depends(require_roles(*MANAGEMENT_ROLES)),
+):
+    if not file.filename or not file.filename.lower().endswith(".xlsx"):
+        raise HTTPException(status_code=422, detail="File import harus berformat .xlsx")
+    try:
+        workbook = openpyxl.load_workbook(io.BytesIO(file.file.read()), read_only=True, data_only=True)
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"File Excel tidak dapat dibaca: {exc}") from exc
+
+    worksheet = workbook.active
+    rows = worksheet.iter_rows(values_only=True)
+    headers = [str(value or "").strip().lower() for value in next(rows, ())]
+    asset_index = headers.index("asset id") if "asset id" in headers else -1
+    task_index = headers.index("task list") if "task list" in headers else -1
+    if asset_index < 0 or task_index < 0:
+        raise HTTPException(status_code=422, detail="Header wajib: Asset ID dan Task List")
+
+    errors: list[str] = []
+    created = 0
+    for row_number, row in enumerate(rows, start=2):
+        asset_id = str(row[asset_index] or "").strip()
+        task_list = str(row[task_index] or "").strip()
+        if not asset_id or not task_list:
+            errors.append(f"Baris {row_number}: Asset ID dan Task List wajib diisi")
+            continue
+        equipment = db.query(Equipment).filter(Equipment.asset_id == asset_id).first()
+        if not equipment:
+            errors.append(f"Baris {row_number}: Asset ID '{asset_id}' tidak ditemukan")
+            continue
+        duplicate = db.query(EquipmentTaskCatalog).filter(
+            EquipmentTaskCatalog.equipment_id == equipment.id,
+            EquipmentTaskCatalog.task_list == task_list,
+        ).first()
+        if duplicate:
+            continue
+        db.add(EquipmentTaskCatalog(
+            equipment_id=equipment.id,
+            task_list=task_list,
+            active=True,
+            review_status="approved",
+            source="import",
+        ))
+        created += 1
+
+    db.commit()
+    return TaskCatalogImportSummary(success=not errors, total_created=created, errors=errors)
+
+
+@router.get("/task-catalog/candidates", response_model=list[EquipmentTaskCatalogResponse])
+def list_task_catalog_candidates(
+    db: Session = Depends(get_db),
+    _=Depends(require_roles(*MANAGEMENT_ROLES)),
+):
+    return (
+        db.query(EquipmentTaskCatalog)
+        .filter(EquipmentTaskCatalog.review_status == "pending")
+        .order_by(EquipmentTaskCatalog.created_at.desc())
+        .all()
+    )
+
+
+@router.patch("/task-catalog/{task_id}", response_model=EquipmentTaskCatalogResponse)
+def review_task_catalog(
+    task_id: UUID,
+    payload: TaskCatalogReviewUpdate,
+    db: Session = Depends(get_db),
+    _=Depends(require_roles(*MANAGEMENT_ROLES)),
+):
+    task = db.query(EquipmentTaskCatalog).filter(EquipmentTaskCatalog.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task catalog tidak ditemukan")
+    task.review_status = payload.review_status
+    task.active = payload.active if payload.review_status == "approved" else False
+    db.commit()
+    db.refresh(task)
+    return task
 
 
 @router.post("/machines/{machine_id}/components", response_model=ComponentResponse, status_code=201)
@@ -544,7 +650,7 @@ async def import_equipment_excel(
 def operator_equipment_options(
     section: str = Query(..., pattern="^[1-5]$"),
     db: Session = Depends(get_db),
-    _=Depends(require_roles("operator")),
+    _=Depends(require_roles(*HIERARCHY_READ_ROLES)),
 ):
     return db.query(Equipment).filter(Equipment.section == section).order_by(Equipment.asset_id).all()
 

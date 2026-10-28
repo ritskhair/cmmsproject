@@ -45,7 +45,7 @@ export default function Login() {
       });
       saveAuthSession("operator", "operator", result.role, result.token);
       setShowSuccess(true);
-      setTimeout(() => navigate("/operator/work-orders"), 1500);
+      setTimeout(() => navigate("/operator"), 1500);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Login operator gagal.");
     }
