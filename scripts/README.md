@@ -7,11 +7,11 @@ For a new database, set `INITIAL_ADMIN_USERNAME` and
 `super_admin` during its first database initialization, only when no
 `super_admin` exists yet. The password is hashed before it is stored.
 
-The Docker deployment also creates PostgreSQL automatically. Set
-`POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB` in the server `.env`.
-The database data is stored in the `cmms_postgres_data` Docker volume. Do not
-run `docker compose down -v` unless you intentionally want to delete that
-database volume.
+The Docker deployment uses the PostgreSQL installation on the server, not a
+PostgreSQL container. Set `DATABASE_URL` to the server PostgreSQL host. On
+backend startup, the application connects to `DB_BOOTSTRAP_ADMIN_DATABASE` and
+creates the target database if it does not exist. The PostgreSQL user in
+`DATABASE_URL` must have `CREATEDB`. Existing databases and data are preserved.
 
 After the first administrator exists, these variables are ignored by the
 bootstrap check. Create additional users from the application's User
@@ -32,7 +32,8 @@ Open `http://127.0.0.1:5173` in the browser. The backend uses `http://127.0.0.1:
 Before the first run, copy `backend/.env.example` to `backend/.env` and set the PostgreSQL password and database values.
 
 For Docker deployment, copy `.env.docker.example` to `.env` instead. Do not
-copy `backend/.env.example` as the root Compose environment file.
+copy `backend/.env.example` as the root Compose environment file. Database
+creation occurs during `docker compose up`, not during `docker compose build`.
 
 ## Deploy on a laptop or local network
 

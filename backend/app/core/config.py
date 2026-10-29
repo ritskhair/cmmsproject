@@ -13,6 +13,10 @@ if not DATABASE_URL:
 		"dan isi URL PostgreSQL yang valid."
 	)
 
+DB_BOOTSTRAP_ADMIN_DATABASE = os.getenv("DB_BOOTSTRAP_ADMIN_DATABASE", "postgres").strip()
+if not DB_BOOTSTRAP_ADMIN_DATABASE:
+	raise RuntimeError("DB_BOOTSTRAP_ADMIN_DATABASE tidak boleh kosong.")
+
 OPERATOR_ALLOWED_NETWORKS = os.getenv("OPERATOR_ALLOWED_NETWORKS", "127.0.0.1/32,::1/128")
 CORS_ALLOWED_ORIGINS = [
 	origin.strip()
