@@ -18,6 +18,7 @@ export default function OperatorLayout() {
     <div className="operator-layout">
       <header className="operator-header">
         <Link to="/login" className="operator-brand">
+          <img className="operator-brand-logo" src="/Logo SAMKO.jpeg" alt="SAMKO" />
           CMMS
         </Link>
 

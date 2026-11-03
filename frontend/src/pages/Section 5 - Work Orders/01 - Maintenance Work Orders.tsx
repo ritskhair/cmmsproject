@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { apiRequest, type Equipment, type EwoRequest } from "../../utils/api";
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import { getAuthSession } from "../../utils/auth";
 
 type CompletionForm = {
   condition_after_repair: string;
@@ -41,6 +43,18 @@ export default function WorkOrders() {
   }
 
   useEffect(() => { void loadData(); }, []);
+  const { lastUpdated, isRefreshing } = useAutoRefresh(loadData);
+  const isSuperAdmin = getAuthSession()?.role === "super_admin";
+
+  async function deleteHistory(ewo: EwoRequest) {
+    if (!window.confirm(`Hapus History EWO ${ewo.ewo_number}? Tindakan ini tidak dapat dibatalkan.`)) return;
+    try {
+      await apiRequest<void>(`/ewo-requests/${ewo.id}`, { method: "DELETE" });
+      await loadData();
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "History EWO gagal dihapus.");
+    }
+  }
 
   const equipmentNames = useMemo(
     () => new Map(equipment.map((item) => [item.id, item.name])),
@@ -103,6 +117,7 @@ export default function WorkOrders() {
         <div><h1>Work Orders</h1><p>Open, Completing, dan History Emergency Work Order</p></div>
         <div className="profile-initial">MT</div>
       </header>
+      <p className="refresh-status" aria-live="polite">{isRefreshing ? "Memperbarui data..." : lastUpdated ? `Diperbarui ${lastUpdated.toLocaleTimeString()}` : "Memuat data..."}</p>
       {error && <p className="login-error">{error}</p>}
       <section className="ewo-kpi-grid">
         <div className="ewo-kpi-card"><span>Open EWO</span><strong>{open.length}</strong></div>
@@ -124,7 +139,7 @@ export default function WorkOrders() {
 
       <section className="ewo-section">
         <div className="section-title"><h2>History EWO</h2><p>EWO completed dan tidak dapat diubah lagi.</p></div>
-        <div className="history-list">{history.length ? history.map((ewo) => <div className="history-item" key={ewo.id}><div><strong>{ewo.ewo_number}</strong><p>{equipmentNames.get(ewo.equipment_id) || ewo.equipment_id} — {ewo.requestor_name}</p><small>Section {ewo.section} · {new Date(ewo.created_at).toLocaleString()}</small></div><span className="status-badge status-done">History EWO</span></div>) : <p className="empty-history">Tidak ada History EWO.</p>}</div>
+        <div className="history-list">{history.length ? history.map((ewo) => <div className="history-item" key={ewo.id}><div><strong>{ewo.ewo_number}</strong><p>{equipmentNames.get(ewo.equipment_id) || ewo.equipment_id} — {ewo.requestor_name}</p><small>Section {ewo.section} · {new Date(ewo.created_at).toLocaleString()}</small></div>{isSuperAdmin && <button type="button" className="delete-history-button" onClick={() => void deleteHistory(ewo)}>Hapus</button>}</div>) : <p className="empty-history">Tidak ada History EWO.</p>}</div>
       </section>
 
       {selected && <div className="ewo-modal-backdrop"><section className="ewo-completion-modal"><h2>Completing {selected.ewo_number}</h2><p>{equipmentNames.get(selected.equipment_id) || selected.equipment_id}</p><div className="operator-detail-grid">

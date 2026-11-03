@@ -8,14 +8,73 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.login-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.login-brand-logo,
+.sidebar-brand-logo,
+.operator-brand-logo {
+  display: block;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.login-brand-logo {
+  width: 92px;
+  height: 92px;
+}
+
 * {
   box-sizing: border-box;
+}
+
+.sidebar-brand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.sidebar-brand-logo {
+  width: 34px;
+  height: 34px;
 }
 
 html,
 body {
   margin: 0;
   min-height: 100%;
+}
+
+.operator-brand-logo {
+  width: 34px;
+  height: 34px;
+}
+
+.refresh-status {
+  margin: 0 0 12px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.delete-history-button {
+  padding: 8px 12px;
+  border: 1px solid #b22417;
+  border-radius: 8px;
+  background: #fff;
+  color: #b22417;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.delete-history-button:hover {
+  background: #fff1f0;
 }
 
 body {
@@ -443,7 +502,7 @@ PANEL KIRI
 }
 
 .brand-title {
-  margin: 0 0 28px;
+  margin: 0;
   color: #ffffff;
   font-size: 44px;
   font-weight: 700;
@@ -455,6 +514,115 @@ PANEL KIRI
   color: #e3c770;
   font-size: 11px;
   font-weight: 700;
+}
+
+.ewo-notification-stack {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1000;
+  display: flex;
+  width: min(360px, calc(100vw - 32px));
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.ewo-notification {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e3c770;
+  border-radius: 12px;
+  background: #fffdf7;
+  box-shadow: 0 12px 30px rgba(53, 24, 19, 0.2);
+  pointer-events: auto;
+  animation: ewoNotificationIn 0.2s ease-out;
+}
+
+.ewo-notification-icon-wrap {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff1d2;
+  color: #a64b13;
+}
+
+.ewo-notification-icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.ewo-notification-content {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  color: #4b5563;
+  font-size: 12px;
+}
+
+.ewo-notification-content strong {
+  color: #681813;
+  font-size: 13px;
+}
+
+.ewo-notification-content span:last-child {
+  overflow: hidden;
+  color: #111827;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ewo-notification-close {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.ewo-notification-close:hover {
+  background: #f3e8e5;
+  color: #681813;
+}
+
+.ewo-notification-close svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
+}
+
+@keyframes ewoNotificationIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .brand-heading {
@@ -870,8 +1038,15 @@ Remember me dan forgot password
   outline: 1px solid #c9a227;
 }
 
-.sidebar-bullet {
-  color: #c9a227;
+.sidebar-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  fill: none;
+  stroke: #f0d98a;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 
 /* =======================================================
@@ -1561,6 +1736,9 @@ tbody tr:nth-child(even) {
 }
 
 .operator-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   color: white;
   font-size: 28px;
   font-weight: 700;

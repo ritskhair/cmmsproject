@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { apiRequest } from "../../utils/api";
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 type Role = "teknisi" | "team_leader" | "manager" | "general_manager" | "super_admin";
 type Account = {
@@ -53,6 +54,7 @@ export default function UserManagement() {
   }
 
   useEffect(() => { void loadUsers(); }, []);
+  const { lastUpdated, isRefreshing } = useAutoRefresh(loadUsers);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -124,6 +126,7 @@ export default function UserManagement() {
     <div className="user-management-page">
       <section className="page-header"><div><h1>User Management</h1></div><div className="page-header-actions"><button className="search-icon-button" type="button">⌕</button><div className="profile-circle">SA</div></div></section>
       <p className="page-description">Manage system users, roles and access permissions</p>
+      <p className="refresh-status" aria-live="polite">{isRefreshing ? "Memperbarui data..." : lastUpdated ? `Diperbarui ${lastUpdated.toLocaleTimeString()}` : "Memuat data..."}</p>
       <section className="summary-grid"><div className="summary-card"><span>Total Users</span><strong className="summary-maroon">{users.length}</strong></div><div className="summary-card"><span>Super Admin</span><strong className="summary-green">{superAdmins}</strong></div><div className="summary-card"><span>Manager</span><strong className="summary-gold">{managers}</strong></div><div className="summary-card"><span>Teknisi / Team Leader</span><strong className="summary-red">{technicians}</strong></div></section>
       {error && <p className="login-error">{error}</p>}
       <section className="user-table-card"><div className="table-toolbar"><div className="user-search-wrapper"><span>⌕</span><input placeholder="Search" value={search} onChange={(event) => setSearch(event.target.value)} /></div><div className="toolbar-actions"><button type="button" className="secondary-button" onClick={() => setShowFilter((value) => !value)}>☷ &nbsp; Tampilkan</button><button type="button" className="primary-button" onClick={openAdd}>＋ Tambah Data</button></div></div>

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type DashboardSummary, type FailureBySection, fetchDashboardSummary } from "../../utils/api";
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 import {
   Bar,
   CartesianGrid,
@@ -390,6 +391,9 @@ export default function MaintenanceDashboard() {
     loadSummary(dateFrom, dateTo, section);
   }, [dateFrom, dateTo, section, loadSummary]);
   /* eslint-enable react-hooks/set-state-in-effect */
+  const { lastUpdated, isRefreshing } = useAutoRefresh(
+    () => loadSummary(dateFrom, dateTo, section),
+  );
 
   const handleFilterApply = (from: string, to: string, sec: string) => {
     setDateFrom(from);
@@ -462,6 +466,7 @@ export default function MaintenanceDashboard() {
           </div>
         </div>
       </header>
+      <p className="refresh-status" aria-live="polite">{isRefreshing ? "Memperbarui data..." : lastUpdated ? `Diperbarui ${lastUpdated.toLocaleTimeString()}` : "Memuat data..."}</p>
 
       {/* FILTER PANEL OVERLAY */}
       {filterOpen && (

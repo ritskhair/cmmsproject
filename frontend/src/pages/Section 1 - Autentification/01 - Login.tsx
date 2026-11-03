@@ -57,11 +57,12 @@ export default function Login() {
         {/* Panel kiri */}
         <div className="login-brand-panel">
           <div className="brand-content">
-            <h1 className="brand-title">CMMS</h1>
+            <div className="login-brand-row">
+              <img className="login-brand-logo" src="/Logo SAMKO.jpeg" alt="SAMKO" />
+              <h1 className="brand-title">CMMS</h1>
+            </div>
 
-            <p className="brand-subtitle">
-              MAINTENANCE MANAGEMENT SYSTEM
-            </p>
+            <p className="brand-subtitle">COMPUTERIZED MAINTENANCE MANAGEMENT SYSTEM</p>
 
             <h2 className="brand-heading">
               Control your assets.

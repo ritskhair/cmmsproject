@@ -5,6 +5,7 @@ import { apiRequest, type Equipment, type Section } from "../../utils/api";
 import { getAuthSession, isOperatorRole } from "../../utils/auth";
 import ImportEquipmentModal from "./ImportEquipmentModal";
 import TaskCatalogImportModal from "./TaskCatalogImportModal";
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 const statuses = ["Operational", "Warning", "Critical"] as const;
 
@@ -63,6 +64,7 @@ export default function EquipmentList() {
   useEffect(() => {
     void loadEquipment();
   }, [loadEquipment]);
+  const { lastUpdated, isRefreshing } = useAutoRefresh(loadEquipment);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const filteredEquipment = useMemo(() => {
@@ -85,6 +87,7 @@ export default function EquipmentList() {
     <div className="page-container">
       <header className="page-header"><h1>Equipment</h1><div className="header-profile">SA</div></header>
       <p className="page-description">Asset registry, condition and maintenance readiness</p>
+      <p className="refresh-status" aria-live="polite">{isRefreshing ? "Memperbarui data..." : lastUpdated ? `Diperbarui ${lastUpdated.toLocaleTimeString()}` : "Memuat data..."}</p>
       <section className="equipment-filters">
         <div className="filter-group search-filter"><label htmlFor="equipment-search">Search equipment</label><input id="equipment-search" placeholder="Asset ID / name" value={search} onChange={(event) => setSearch(event.target.value)} /></div>
         <div className="filter-group"><label htmlFor="status-filter">Status</label><select id="status-filter" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="">All statuses</option>{statuses.map((status) => <option key={status}>{status}</option>)}</select></div>

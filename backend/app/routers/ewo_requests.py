@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func, text
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -29,8 +29,18 @@ OPERATOR_APPROVAL_ROLES = CREATE_ROLES
 def next_ewo_number(db: Session) -> str:
     year = datetime.utcnow().year
     db.execute(text("SELECT pg_advisory_xact_lock(hashtext(:key))"), {"key": f"ewo-number-{year}"})
-    count = db.query(EwoRequest).filter(EwoRequest.ewo_number.like(f"EWO-{year}-%")).count()
-    return f"EWO-{year}-{count + 1:04d}"
+    existing_numbers = db.query(EwoRequest.ewo_number).filter(
+        EwoRequest.ewo_number.like(f"EWO-{year}-%"),
+    ).all()
+    last_sequence = max(
+        (
+            int(ewo_number.rsplit("-", 1)[1])
+            for (ewo_number,) in existing_numbers
+            if ewo_number.rsplit("-", 1)[-1].isdigit()
+        ),
+        default=0,
+    )
+    return f"EWO-{year}-{last_sequence + 1:04d}"
 
 
 @router.get("", response_model=list[EwoRequestResponse])
@@ -192,5 +202,7 @@ def delete_ewo_request(ewo_id: UUID, db: Session = Depends(get_db), _=Depends(re
     ewo = db.query(EwoRequest).filter(EwoRequest.id == ewo_id).first()
     if not ewo:
         raise HTTPException(status_code=404, detail="EWO request not found")
+    if ewo.status != "completed":
+        raise HTTPException(status_code=409, detail="Hanya History EWO yang dapat dihapus")
     db.delete(ewo)
     db.commit()

@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { apiRequest, type Component, type Equipment, type Section } from "../../utils/api";
+import { useAutoRefresh } from "../../hooks/useAutoRefresh";
 
 type HistoryItem = {
   id: string;
@@ -59,28 +60,27 @@ export default function EquipmentDetail() {
     void apiRequest<Section[]>("/equipment/sections").then(setSections).catch(() => {});
   }, []);
 
-  useEffect(() => {
+  const loadDetails = useCallback(async () => {
     if (!equipmentId) return;
     setError("");
-    
-    // Load equipment first
-    apiRequest<Equipment>(`/equipment/${equipmentId}`)
-      .then((equipmentResult) => {
-        setEquipment(equipmentResult);
-        
-        // Load history and components in parallel
-        void apiRequest<HistoryItem[]>(`/equipment/${equipmentId}/history`)
-          .then(setHistory)
-          .catch(() => setHistory([]));
-
-        void apiRequest<Component[]>(`/equipment/machines/${equipmentId}/components`)
-          .then(setComponents)
-          .catch(() => setComponents([]));
-      })
-      .catch((requestError) => {
-        setError(requestError instanceof Error ? requestError.message : "Detail equipment gagal dimuat.");
-      });
+    try {
+      const [equipmentResult, historyResult, componentResult] = await Promise.all([
+        apiRequest<Equipment>(`/equipment/${equipmentId}`),
+        apiRequest<HistoryItem[]>(`/equipment/${equipmentId}/history`),
+        apiRequest<Component[]>(`/equipment/machines/${equipmentId}/components`),
+      ]);
+      setEquipment(equipmentResult);
+      setHistory(historyResult);
+      setComponents(componentResult);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Detail equipment gagal dimuat.");
+    }
   }, [equipmentId]);
+
+  useEffect(() => {
+    void loadDetails();
+  }, [loadDetails]);
+  const { lastUpdated, isRefreshing } = useAutoRefresh(loadDetails, { enabled: Boolean(equipmentId) });
 
   // Close component menu when clicking outside
   useEffect(() => {
@@ -218,6 +218,7 @@ export default function EquipmentDetail() {
         <h1>Equipment Detail</h1>
         <div className="header-profile">SA</div>
       </header>
+      <p className="refresh-status" aria-live="polite">{isRefreshing ? "Memperbarui data..." : lastUpdated ? `Diperbarui ${lastUpdated.toLocaleTimeString()}` : "Memuat data..."}</p>
 
       {/* EQUIPMENT TITLE STRIP — editable */}
       {editingEquipment ? (
