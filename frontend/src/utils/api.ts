@@ -87,6 +87,7 @@ export type Equipment = {
   section: "1" | "2" | "3" | "4" | "5";
   section_id: string | null;
   status: "Operational" | "Warning" | "Critical";
+  priority: "High" | "Medium" | "Low" | null;
   last_pm: string | null;
   created_at: string;
 };

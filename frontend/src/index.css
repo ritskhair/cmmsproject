@@ -1425,6 +1425,27 @@ tbody tr:nth-child(even) {
   color: #b22417;
 }
 
+.priority-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 1px solid #c9a227;
+  border-radius: 12px;
+  color: #681813;
+  font-weight: 700;
+}
+
+.priority-high {
+  background: #fff1f0;
+}
+
+.priority-medium {
+  background: #fff9e6;
+}
+
+.priority-low {
+  background: #f0fdf4;
+}
+
 .empty-state {
   padding: 30px;
   text-align: center;
@@ -3014,7 +3035,7 @@ tbody tr:nth-child(even) {
 
 .equipment-edit-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 12px;
 }

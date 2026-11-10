@@ -318,7 +318,8 @@ def generate_equipment_template_bytes() -> bytes:
         ("3", "Sheet 'Components'", "Kolom 'Asset ID Mesin' wajib diisi sama persis dengan Asset ID di sheet Equipment agar komponen langsung terhubung ke mesinnya."),
         ("4", "Tipe / Merek Komponen", "Bebas diisi merek atau tipe komponen (misal: Siemens, Mitsubishi, Omron, SMC, FESTO, dsb)."),
         ("5", "Kolom Last PM", "Opsional. Jika dikosongkan tidak apa-apa, nanti akan otomatis terupdate saat ada riwayat EWO/PM baru."),
-        ("6", "Metode Upload di Web", "Bisa Drag & Drop file langsung ke browser atau klik tombol Browse/Pilih File."),
+        ("6", "Priority", "Nilai valid: High, Medium, Low. Sel kosong = tidak mengubah nilai priority yang sudah ada."),
+        ("7", "Metode Upload di Web", "Bisa Drag & Drop file langsung ke browser atau klik tombol Browse/Pilih File."),
     ]
 
     for row_idx, row_data in enumerate(instructions, start=4):
@@ -340,7 +341,7 @@ def generate_equipment_template_bytes() -> bytes:
     # Sheet Equipment
     ws_eq = wb.create_sheet(title="Equipment")
     ws_eq.views.sheetView[0].showGridLines = True
-    eq_headers = ["Asset ID *", "Nama Mesin *", "Tipe Mesin *", "Section *", "Status (Opsional)", "Last PM (Opsional)"]
+    eq_headers = ["Asset ID *", "Nama Mesin *", "Tipe Mesin *", "Section *", "Priority (High/Medium/Low)", "Status (Opsional)", "Last PM (Opsional)"]
     for col_idx, header in enumerate(eq_headers, start=1):
         cell = ws_eq.cell(row=1, column=col_idx, value=header)
         cell.fill = header_fill
@@ -349,11 +350,11 @@ def generate_equipment_template_bytes() -> bytes:
         cell.border = thin_border
 
     sample_eq_data = [
-        ("EQ-001", "CNC Milling Machine 01", "Machining", "Section 1", "Operational", "2026-09-15"),
-        ("EQ-002", "Hydraulic Press 50T", "Pressing", "Section 2", "", ""),
-        ("EQ-003", "Main Conveyor Line A", "Conveyor", "Section 3", "Operational", ""),
-        ("EQ-004", "Air Compressor Unit 2", "Utility", "Section 1", "", ""),
-        ("EQ-005", "Automated Stamping Press", "Stamping", "Section 4", "", ""),
+        ("EQ-001", "CNC Milling Machine 01", "Machining", "Section 1", "High", "Operational", "2026-09-15"),
+        ("EQ-002", "Hydraulic Press 50T", "Pressing", "Section 2", "Medium", "", ""),
+        ("EQ-003", "Main Conveyor Line A", "Conveyor", "Section 3", "Low", "Operational", ""),
+        ("EQ-004", "Air Compressor Unit 2", "Utility", "Section 1", "", "", ""),
+        ("EQ-005", "Automated Stamping Press", "Stamping", "Section 4", "", "", ""),
     ]
     for row_idx, row_data in enumerate(sample_eq_data, start=2):
         for col_idx, val in enumerate(row_data, start=1):
@@ -499,6 +500,17 @@ async def import_equipment_excel(
     section_col = find_eq_col("section", "area", "seksi")
     status_col = find_eq_col("status")
     last_pm_col = find_eq_col("last pm", "last_pm", "pm terakhir")
+    priority_col = next(
+        (
+            idx
+            for header, idx in eq_header_map.items()
+            if header == "priority"
+            or header == "prioritas"
+            or header.startswith("priority ")
+            or header.startswith("prioritas ")
+        ),
+        None,
+    )
 
     if not asset_col or not name_col:
         raise HTTPException(
@@ -533,6 +545,14 @@ async def import_equipment_excel(
 
         last_pm_val = ws_eq.cell(row=row_idx, column=last_pm_col).value if last_pm_col else None
         last_pm_dt = parse_date_value(last_pm_val)
+        priority_val = ws_eq.cell(row=row_idx, column=priority_col).value if priority_col else None
+        priority_raw = str(priority_val).strip() if priority_val is not None else ""
+        priority = None
+        if priority_raw:
+            priority_by_name = {"high": "High", "medium": "Medium", "low": "Low"}
+            priority = priority_by_name.get(priority_raw.casefold())
+            if priority is None:
+                errors.append(f"Baris {row_idx}: Nilai priority tidak valid '{priority_raw}'")
 
         # Check if equipment exists
         existing_eq = db.query(Equipment).filter(Equipment.asset_id == asset_id).first()
@@ -546,6 +566,8 @@ async def import_equipment_excel(
                 existing_eq.status = status_str
             if last_pm_dt is not None:
                 existing_eq.last_pm = last_pm_dt
+            if priority is not None:
+                existing_eq.priority = priority
             equipment_by_asset_id[asset_id.lower()] = existing_eq
             total_equipment_updated += 1
         else:
@@ -555,6 +577,7 @@ async def import_equipment_excel(
                 type=type_str,
                 section=section_code,
                 section_id=matching_section.id if matching_section else None,
+                priority=priority,
                 status=status_str,
                 last_pm=last_pm_dt,
             )

@@ -14,6 +14,7 @@ type EquipmentForm = {
   name: string;
   type: string;
   section: string;
+  priority: Equipment["priority"];
 };
 
 function getStatusClass(status: Equipment["status"]) {
@@ -35,6 +36,7 @@ export default function EquipmentList() {
     name: "",
     type: "",
     section: "1",
+    priority: null,
   });
 
   const authSession = getAuthSession();
@@ -75,7 +77,7 @@ export default function EquipmentList() {
   async function addEquipment() {
     try {
       await apiRequest<Equipment>("/equipment", { method: "POST", body: JSON.stringify({ ...form, status: "Operational" }) });
-      setForm({ asset_id: "", name: "", type: "", section: "1" });
+      setForm({ asset_id: "", name: "", type: "", section: "1", priority: null });
       setShowForm(false);
       await loadEquipment();
     } catch (requestError) {
@@ -113,10 +115,10 @@ export default function EquipmentList() {
         )}
         <button type="button" className="primary-button" onClick={() => setShowForm((value) => !value)}>Add Equipment</button>
       </section>
-      {showForm && <section className="equipment-form-card"><div className="equipment-form-header"><div><h2>Add Equipment</h2><p>Register a machine under a section.</p></div><button type="button" className="secondary-button" onClick={() => setShowForm(false)}>Cancel</button></div><div className="equipment-form-grid"><div className="filter-group"><label htmlFor="add-equipment-asset-id">Asset ID</label><input id="add-equipment-asset-id" placeholder="e.g. MCH-001" value={form.asset_id} onChange={(event) => setForm({ ...form, asset_id: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-name">Machine name</label><input id="add-equipment-name" placeholder="e.g. Pellet Mill 01" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-type">Machine type</label><input id="add-equipment-type" placeholder="e.g. Motor" value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-section">Section</label><select id="add-equipment-section" value={form.section} onChange={(event) => setForm({ ...form, section: event.target.value })}>{sections.map((section) => <option key={section.code} value={section.code}>{section.name}</option>)}</select></div></div><div className="equipment-form-actions"><button type="button" className="primary-button" onClick={() => void addEquipment()}>Save Equipment</button></div></section>}
+      {showForm && <section className="equipment-form-card"><div className="equipment-form-header"><div><h2>Add Equipment</h2><p>Register a machine under a section.</p></div><button type="button" className="secondary-button" onClick={() => setShowForm(false)}>Cancel</button></div><div className="equipment-form-grid"><div className="filter-group"><label htmlFor="add-equipment-asset-id">Asset ID</label><input id="add-equipment-asset-id" placeholder="e.g. MCH-001" value={form.asset_id} onChange={(event) => setForm({ ...form, asset_id: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-name">Machine name</label><input id="add-equipment-name" placeholder="e.g. Pellet Mill 01" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-type">Machine type</label><input id="add-equipment-type" placeholder="e.g. Motor" value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-section">Section</label><select id="add-equipment-section" value={form.section} onChange={(event) => setForm({ ...form, section: event.target.value })}>{sections.map((section) => <option key={section.code} value={section.code}>{section.name}</option>)}</select></div><div className="filter-group"><label htmlFor="add-equipment-priority">Priority</label><select id="add-equipment-priority" value={form.priority ?? ""} onChange={(event) => setForm({ ...form, priority: event.target.value === "" ? null : event.target.value as Equipment["priority"] })}><option value="">Belum diisi</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></div></div><div className="equipment-form-actions"><button type="button" className="primary-button" onClick={() => void addEquipment()}>Save Equipment</button></div></section>}
       {error && <p className="login-error">{error}</p>}
       <section className="equipment-summary"><div><span>Total Assets</span><strong>{equipment.length}</strong></div><div><span>Operational</span><strong className="text-green">{equipment.filter((item) => item.status === "Operational").length}</strong></div><div><span>Warning</span><strong className="text-orange">{equipment.filter((item) => item.status === "Warning").length}</strong></div><div><span>Critical</span><strong className="text-red">{equipment.filter((item) => item.status === "Critical").length}</strong></div></section>
-      <section className="equipment-hierarchy"><div className="table-card"><div className="table-scroll"><table><thead><tr><th>Asset ID</th><th>Machine</th><th>Section</th><th>Type</th><th>Status</th><th>Last PM</th></tr></thead><tbody>{filteredEquipment.map((item) => <tr key={item.id}><td><Link to={`/equipment/${item.id}`} className="equipment-link">{item.asset_id}</Link></td><td><Link to={`/equipment/${item.id}`} className="equipment-name-link">{item.name}</Link></td><td>{item.section}</td><td>{item.type}</td><td><span className={`status-text ${getStatusClass(item.status)}`}>{item.status}</span></td><td>{item.last_pm ? new Date(item.last_pm).toLocaleString() : "-"}</td></tr>)}</tbody></table></div>{filteredEquipment.length === 0 && <p className="empty-state">Equipment tidak ditemukan.</p>}</div>
+      <section className="equipment-hierarchy"><div className="table-card"><div className="table-scroll"><table><thead><tr><th>Asset ID</th><th>Machine</th><th>Section</th><th>Type</th><th>Priority</th><th>Status</th><th>Last PM</th></tr></thead><tbody>{filteredEquipment.map((item) => <tr key={item.id}><td><Link to={`/equipment/${item.id}`} className="equipment-link">{item.asset_id}</Link></td><td><Link to={`/equipment/${item.id}`} className="equipment-name-link">{item.name}</Link></td><td>{item.section}</td><td>{item.type}</td><td><span className={item.priority ? `priority-badge priority-${item.priority.toLowerCase()}` : ""}>{item.priority ?? "-"}</span></td><td><span className={`status-text ${getStatusClass(item.status)}`}>{item.status}</span></td><td>{item.last_pm ? new Date(item.last_pm).toLocaleString() : "-"}</td></tr>)}</tbody></table></div>{filteredEquipment.length === 0 && <p className="empty-state">Equipment tidak ditemukan.</p>}</div>
       </section>
 
       {/* Super Admin Import Equipment Modal */}

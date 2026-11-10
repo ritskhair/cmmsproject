@@ -17,6 +17,7 @@ class Equipment(Base):
     type = Column(String(100), nullable=False)
     section = Column(String(100), nullable=False)
     section_id = Column(UUID(as_uuid=True), ForeignKey("sections.id"), nullable=True)
+    priority = Column(String(10), nullable=True)
     status = Column(String(20), default="Operational", nullable=False)
     last_pm = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

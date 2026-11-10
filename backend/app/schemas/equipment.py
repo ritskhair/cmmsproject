@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 EquipmentStatus = Literal["Operational", "Warning", "Critical"]
+EquipmentPriority = Literal["High", "Medium", "Low"]
 
 
 class Section(str, Enum):
@@ -23,6 +24,7 @@ class EquipmentCreate(BaseModel):
     type: str
     section: Section
     status: EquipmentStatus = "Operational"
+    priority: EquipmentPriority | None = None
 
 
 class EquipmentUpdate(BaseModel):
@@ -31,6 +33,7 @@ class EquipmentUpdate(BaseModel):
     type: str | None = None
     section: Section | None = None
     status: EquipmentStatus | None = None
+    priority: EquipmentPriority | None = None
 
 
 class EquipmentResponse(BaseModel):
@@ -43,6 +46,7 @@ class EquipmentResponse(BaseModel):
     section: Section
     section_id: UUID | None
     status: EquipmentStatus
+    priority: EquipmentPriority | None
     last_pm: datetime | None
     created_at: datetime
 

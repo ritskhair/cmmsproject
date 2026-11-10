@@ -44,6 +44,7 @@ export default function EquipmentDetail() {
     type: "",
     section: "",
     status: "Operational",
+    priority: null as Equipment["priority"],
   });
   const [savingEquipment, setSavingEquipment] = useState(false);
 
@@ -147,6 +148,7 @@ export default function EquipmentDetail() {
       type: equipment.type,
       section: equipment.section,
       status: equipment.status,
+      priority: equipment.priority,
     });
     setEditingEquipment(true);
   }
@@ -271,6 +273,19 @@ export default function EquipmentDetail() {
                   {statuses.map((s) => <option key={s}>{s}</option>)}
                 </select>
               </div>
+              <div className="compact-field">
+                <label htmlFor="edit-eq-priority">Priority</label>
+                <select
+                  id="edit-eq-priority"
+                  value={equipmentEditForm.priority ?? ""}
+                  onChange={(e) => setEquipmentEditForm({ ...equipmentEditForm, priority: e.target.value === "" ? null : e.target.value as Equipment["priority"] })}
+                >
+                  <option value="">Belum diisi</option>
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
             </div>
             <div className="equipment-edit-actions">
               <button
@@ -332,6 +347,8 @@ export default function EquipmentDetail() {
             <span className="info-compact-value">{equipment.type}</span>
             <span className="info-compact-label">Section:</span>
             <span className="info-compact-value">Section {equipment.section}</span>
+            <span className="info-compact-label">Priority:</span>
+            <span className="info-compact-value">{equipment.priority ?? "-"}</span>
           </div>
         </div>
 
