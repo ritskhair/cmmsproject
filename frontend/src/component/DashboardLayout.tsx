@@ -86,7 +86,9 @@ const roleLabels: Record<UserRole, string> = {
 
 export default function DashboardLayout() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
   const session = getAuthSession();
   const roleLabel = session?.role && roleLabels[session.role] ? roleLabels[session.role] : "USER";
@@ -97,6 +99,61 @@ export default function DashboardLayout() {
     .slice(0, 2)
     .map((part) => part.charAt(0).toUpperCase())
     .join("") || "CM";
+
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false);
+    if (window.innerWidth <= 680) {
+      mobileMenuButtonRef.current?.focus();
+    }
+  };
+
+  useEffect(() => {
+    if (!isMobileSidebarOpen) return;
+
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.querySelector<HTMLAnchorElement>("#admin-sidebar .sidebar-menu-item")?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMobileSidebarOpen(false);
+        mobileMenuButtonRef.current?.focus();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const focusableItems = document.querySelectorAll<HTMLElement>(
+        "#admin-sidebar a[href], #admin-sidebar button:not([disabled])"
+      );
+      const firstItem = focusableItems[0];
+      const lastItem = focusableItems[focusableItems.length - 1];
+      const focusIsOutsideSidebar = !document.getElementById("admin-sidebar")?.contains(document.activeElement);
+
+      if (event.shiftKey && (document.activeElement === firstItem || focusIsOutsideSidebar)) {
+        event.preventDefault();
+        lastItem?.focus();
+      } else if (!event.shiftKey && (document.activeElement === lastItem || focusIsOutsideSidebar)) {
+        event.preventDefault();
+        firstItem?.focus();
+      }
+    };
+
+    const closeOnDesktopResize = () => {
+      if (window.innerWidth > 680) {
+        setIsMobileSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("resize", closeOnDesktopResize);
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("resize", closeOnDesktopResize);
+    };
+  }, [isMobileSidebarOpen]);
 
   useEffect(() => {
     if (!isProfileOpen) return;
@@ -129,7 +186,40 @@ export default function DashboardLayout() {
 
   return (
     <div className="app-layout">
-      <aside className="app-sidebar" aria-label="Main navigation">
+      <button
+        ref={mobileMenuButtonRef}
+        type="button"
+        className="mobile-menu-toggle"
+        onClick={() => setIsMobileSidebarOpen((open) => !open)}
+        aria-label={isMobileSidebarOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
+        aria-expanded={isMobileSidebarOpen}
+        aria-controls="admin-sidebar"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          {isMobileSidebarOpen ? (
+            <path d="m6 6 12 12M18 6 6 18" />
+          ) : (
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          )}
+        </svg>
+      </button>
+
+      {isMobileSidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          onClick={closeMobileSidebar}
+          aria-label="Tutup menu navigasi"
+        />
+      )}
+
+      <aside
+        id="admin-sidebar"
+        className={`app-sidebar${isMobileSidebarOpen ? " is-open" : ""}`}
+        role={isMobileSidebarOpen ? "dialog" : undefined}
+        aria-modal={isMobileSidebarOpen || undefined}
+        aria-label="Main navigation"
+      >
         <div className="sidebar-top">
           <div className="sidebar-brand">
             <img className="sidebar-brand-logo" src="/Logo SAMKO.jpeg" alt="SAMKO" />
@@ -150,6 +240,7 @@ export default function DashboardLayout() {
                 className={({ isActive }) =>
                   `sidebar-menu-item${isActive ? " active" : ""}`
                 }
+                onClick={closeMobileSidebar}
               >
                 <SidebarIcon name={item.icon} />
 
