@@ -40,6 +40,8 @@ creation occurs during `docker compose up`, not during `docker compose build`.
 On the laptop that runs the backend, copy `backend/.env.deploy.example` to `backend/.env` and set:
 
 - `DATABASE_URL`
+- `SILO_DATABASE_URL` (optional; read-only ExecuSys database URL)
+- `SILO_DATA_TIMEOUT_SECONDS` (optional; default `300`)
 - `CORS_ALLOWED_ORIGINS=http://FRONTEND_IP:5173`
 - `OPERATOR_ALLOWED_NETWORKS` to the allowed network, for example `192.168.1.0/24`
 

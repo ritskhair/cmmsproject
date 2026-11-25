@@ -5,5 +5,6 @@ from app.models.ewo_maintenance import EwoMaintenance
 from app.models.ewo_request import EwoRequest
 from app.models.equipment_task import EquipmentTaskCatalog
 from app.models.section import Section
+from app.models.silo import SiloSensorMapping
 
-__all__ = ["Account", "Component", "Equipment", "EquipmentTaskCatalog", "EwoMaintenance", "EwoRequest", "Section"]
+__all__ = ["Account", "Component", "Equipment", "EquipmentTaskCatalog", "EwoMaintenance", "EwoRequest", "Section", "SiloSensorMapping"]

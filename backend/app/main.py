@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from app.core.config import CORS_ALLOWED_ORIGINS
 from app.core.database import engine
-from app.routers import accounts, auth, dashboard, equipment, ewo_requests, maintenance
+from app.routers import accounts, auth, dashboard, equipment, ewo_requests, maintenance, silo_monitoring
 
 app = FastAPI(title="CMMS", version="1.0.0")
 
@@ -22,6 +22,7 @@ app.include_router(equipment.router)
 app.include_router(ewo_requests.router)
 app.include_router(maintenance.router)
 app.include_router(dashboard.router)
+app.include_router(silo_monitoring.router)
 
 @app.get("/")
 def read_root():

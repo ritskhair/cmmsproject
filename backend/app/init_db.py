@@ -13,7 +13,7 @@ from app.core.config import (
 )
 from app.core.database import Base, engine
 from app.core.security import hash_password
-from app.models import Account, Component, Equipment, EwoMaintenance, EwoRequest, Section
+from app.models import Account, Component, Equipment, EwoMaintenance, EwoRequest, Section, SiloSensorMapping
 
 
 def wait_for_database() -> None:

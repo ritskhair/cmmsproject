@@ -181,6 +181,96 @@ export type DashboardSummary = {
   failure_by_section: FailureBySection[];
 };
 
+export type SiloReading = {
+  device_id: string;
+  tag: string;
+  display_name: string | null;
+  equipment: {
+    id: string;
+    name: string;
+    asset_id: string;
+  }[];
+  level_mm: number | null;
+  level_m: number | null;
+  capacity_pct: number | null;
+  sensor_status: string | null;
+  source_created_at: string | null;
+  requested_at: string;
+  freshness: "fresh" | "stale" | "unavailable";
+  error: string | null;
+};
+
+export type SiloSensor = {
+  device_id: string;
+  tag: string;
+  sensor_status: string | null;
+  source_created_at: string | null;
+  has_mapping: boolean;
+};
+
+export type SiloSourceStatus = {
+  configured: boolean;
+  connected: boolean;
+  sensor_count: number;
+  message: string;
+};
+
+export type SiloMapping = {
+  id: string;
+  device_id: string;
+  tag: string;
+  equipment_id: string;
+  enabled: boolean;
+  display_name: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function fetchSiloReadings(): Promise<SiloReading[]> {
+  return apiRequest<SiloReading[]>("/silo-monitoring/readings");
+}
+
+export async function fetchSiloSensors(): Promise<SiloSensor[]> {
+  return apiRequest<SiloSensor[]>("/silo-monitoring/sensors");
+}
+
+export async function fetchSiloSourceStatus(): Promise<SiloSourceStatus> {
+  return apiRequest<SiloSourceStatus>("/silo-monitoring/source-status");
+}
+
+export async function fetchSiloMappings(): Promise<SiloMapping[]> {
+  return apiRequest<SiloMapping[]>("/silo-monitoring/mappings");
+}
+
+export async function createSiloMapping(payload: {
+  device_id: string;
+  tag: string;
+  equipment_ids: string[];
+  enabled: boolean;
+  display_name?: string;
+}): Promise<SiloMapping> {
+  return apiRequest<SiloMapping>("/silo-monitoring/mappings", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateSiloMapping(id: string, payload: {
+  equipment_ids: string[];
+  enabled?: boolean;
+  display_name?: string;
+}): Promise<SiloMapping> {
+  return apiRequest<SiloMapping>(`/silo-monitoring/mappings/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteSiloDependency(deviceId: string, tag: string): Promise<void> {
+  const params = new URLSearchParams({ device_id: deviceId, tag });
+  return apiRequest<void>(`/silo-monitoring/mappings/sensor?${params.toString()}`, { method: "DELETE" });
+}
+
 export async function fetchDashboardSummary(
   dateFrom: string,
   dateTo: string,

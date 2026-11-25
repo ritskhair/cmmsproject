@@ -6,12 +6,12 @@ export type UserRole =
   | "teknisi"
   | "operator";
 
-export type AppPermission = "dashboard" | "work-orders" | "equipment" | "user-management";
+export type AppPermission = "dashboard" | "work-orders" | "equipment" | "user-management" | "silo-monitoring";
 
 const rolePermissions: Record<Exclude<UserRole, "operator">, AppPermission[]> = {
-  super_admin: ["dashboard", "work-orders", "equipment", "user-management"],
-  general_manager: ["dashboard", "work-orders", "equipment"],
-  manager: ["dashboard", "work-orders", "equipment"],
+  super_admin: ["dashboard", "work-orders", "equipment", "user-management", "silo-monitoring"],
+  general_manager: ["dashboard", "work-orders", "equipment", "silo-monitoring"],
+  manager: ["dashboard", "work-orders", "equipment", "silo-monitoring"],
   team_leader: ["work-orders", "equipment"],
   teknisi: ["work-orders"],
 };

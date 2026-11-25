@@ -93,6 +93,431 @@ body {
   background: #f6f5f2;
 }
 
+.silo-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.silo-card,
+.silo-mapping-panel {
+  padding: 22px;
+  background: #fff;
+  border: 1px solid #e4ddd2;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(104, 24, 19, 0.06);
+}
+
+.silo-card,
+.silo-mapping-panel,
+.silo-summary-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.silo-card:hover,
+.silo-mapping-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(104, 24, 19, 0.1);
+}
+
+.silo-page-title {
+  display: grid;
+  gap: 3px;
+}
+
+.silo-eyebrow {
+  color: #b08a18;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.silo-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.silo-card h2,
+.silo-mapping-panel h2 {
+  margin: 0;
+  color: #681813;
+  font-size: 18px;
+}
+
+.silo-refresh-button,
+.silo-primary-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid #c9a227;
+  border-radius: 9px;
+  background: #681813;
+  color: #fff;
+  font-weight: 700;
+}
+
+.silo-refresh-button:hover,
+.silo-primary-button:hover {
+  background: #85251d;
+}
+
+.silo-refresh-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.silo-source-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid;
+  border-radius: 12px;
+}
+
+.silo-source-banner.connected {
+  background: #f0f8f1;
+  border-color: #b7d9bb;
+  color: #245c2d;
+}
+
+.silo-source-banner.disconnected {
+  background: #fff6ed;
+  border-color: #e7c39a;
+  color: #8b4b1f;
+}
+
+.silo-source-banner div {
+  display: grid;
+  gap: 3px;
+}
+
+.silo-source-banner span:not(.silo-source-dot) {
+  color: #5c5954;
+  font-size: 12px;
+}
+
+.silo-source-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 4px rgba(104, 24, 19, 0.08);
+}
+
+.silo-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.silo-summary-card {
+  display: grid;
+  gap: 7px;
+  padding: 16px;
+  border-left: 4px solid #c9a227;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(33, 31, 29, 0.05);
+}
+
+.silo-summary-card span {
+  color: #716b65;
+  font-size: 12px;
+}
+
+.silo-summary-card strong {
+  color: #681813;
+  font-size: 24px;
+}
+
+.silo-capacity {
+  display: block;
+  margin: 16px 0;
+  font-size: 32px;
+}
+
+.silo-muted {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.silo-badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.silo-badge.fresh { background: #16803c; }
+.silo-badge.stale { background: #b7791f; }
+.silo-badge.unavailable { background: #6b7280; }
+
+.silo-mapping-panel {
+  margin-top: 20px;
+}
+
+.silo-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.silo-section-kicker {
+  display: block;
+  margin-bottom: 5px;
+  color: #b08a18;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.silo-count-badge {
+  padding: 7px 10px;
+  border: 1px solid #e1c66c;
+  border-radius: 999px;
+  background: #fffaf0;
+  color: #681813;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.silo-mapping-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.silo-form-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.silo-field {
+  position: relative;
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  color: #4a4745;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.silo-field em {
+  color: #8d8780;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.silo-field input {
+  min-width: 0;
+  height: 42px;
+  padding: 0 11px;
+  border: 1px solid #d5d0c8;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.silo-multi-picker-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  min-height: 42px;
+  padding: 5px 8px;
+  border: 1px solid #d5d0c8;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.silo-multi-picker-input:focus-within {
+  border-color: #b08a18;
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.16);
+}
+
+.silo-multi-picker-input input {
+  flex: 1 1 120px;
+  height: 28px;
+  min-width: 100px;
+  padding: 0 3px;
+  border: 0;
+  outline: 0;
+}
+
+.silo-selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: #f7efe7;
+  color: #681813;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.silo-selected-chip span {
+  color: #b22417;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.silo-picker-options {
+  position: absolute;
+  z-index: 4;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
+  display: grid;
+  max-height: 220px;
+  overflow: auto;
+  padding: 5px;
+  border: 1px solid #d5d0c8;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(33, 31, 29, 0.14);
+}
+
+.silo-picker-options button {
+  padding: 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #211f1d;
+  text-align: left;
+}
+
+.silo-picker-options button:hover,
+.silo-picker-options button[aria-selected="true"] {
+  background: #f7efe7;
+  color: #681813;
+}
+
+.silo-picker-empty {
+  padding: 10px;
+  color: #716b65;
+  font-size: 12px;
+}
+
+.silo-empty-state {
+  display: grid;
+  gap: 6px;
+  padding: 28px;
+  border: 1px dashed #c9a227;
+  border-radius: 12px;
+  background: #fffaf2;
+  color: #681813;
+}
+
+.silo-empty-state span {
+  color: #716b65;
+  font-size: 13px;
+}
+
+.silo-error {
+  margin: 0;
+}
+
+.silo-mapping-list {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.silo-mapping-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  padding: 13px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.silo-mapping-list li > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.silo-mapping-list li span,
+.silo-mapping-list li small {
+  color: #716b65;
+  font-size: 12px;
+}
+
+.silo-list-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.silo-edit-button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid #c9a227;
+  border-radius: 8px;
+  background: #fffaf0;
+  color: #681813;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.silo-edit-button:hover {
+  background: #f7efe7;
+}
+
+.silo-affected-equipment {
+  display: grid;
+  gap: 5px;
+  margin: 14px 0;
+}
+
+.silo-affected-equipment > span:not(.silo-muted) {
+  padding: 7px 9px;
+  border-left: 3px solid #c9a227;
+  background: #fffaf2;
+  color: #4a4745;
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .silo-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .silo-refresh-button {
+    width: 100%;
+  }
+
+  .silo-panel-heading,
+  .silo-mapping-list li {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .silo-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
 button,
 input,
 select,
@@ -1062,17 +1487,19 @@ Remember me dan forgot password
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 10px;
-  background: transparent;
+  min-height: 68px;
+  padding: 10px;
+  border: 1px solid rgba(227, 199, 112, 0.28);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.055);
   color: #ffffff;
   font-family: inherit;
   text-align: left;
   cursor: pointer;
   transition:
     background 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .sidebar-profile:hover {
@@ -1080,39 +1507,87 @@ Remember me dan forgot password
   border-color: #c9a227;
 }
 
-.profile-initial {
+.sidebar-profile:focus-visible,
+.logout-button:focus-visible {
+  outline: 3px solid #e3c770;
+  outline-offset: 3px;
+}
+
+.sidebar-profile .profile-initial {
   width: 44px;
   height: 44px;
   flex: 0 0 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(227, 199, 112, 0.75);
   border-radius: 50%;
   color: #ffffff;
-  background: transparent;
+  background: #87241c;
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.04);
   font-size: 14px;
   font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .profile-information {
+  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .profile-information strong {
   color: #ffffff;
-  font-size: 14px;
+  max-width: 145px;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-information .profile-role {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.profile-information .profile-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  color: #e8dda9;
+  font-size: 10px;
   font-weight: 700;
   line-height: 1.2;
 }
 
-.profile-information span {
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 12px;
-  line-height: 1.2;
+.profile-status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #86d7a5;
+  box-shadow: 0 0 0 2px rgba(134, 215, 165, 0.14);
+}
+
+.profile-chevron {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  fill: none;
+  stroke: #e3c770;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  transition: transform 0.18s ease;
+}
+
+.profile-chevron.open {
+  transform: rotate(180deg);
 }
 
 /* =======================================================
@@ -1120,14 +1595,14 @@ Remember me dan forgot password
 ======================================================= */
 .profile-dropdown {
   position: absolute;
-  left: 0;
+  left: -2px;
   bottom: calc(100% + 10px);
-  width: 100%;
+  width: calc(100% + 4px);
   padding: 8px;
   background: #ffffff;
   color: #681813;
   border: 1px solid #d6cfc7;
-  border-radius: 12px;
+  border-radius: 14px;
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.18),
     0 2px 8px rgba(0, 0, 0, 0.08);
@@ -1136,12 +1611,65 @@ Remember me dan forgot password
   animation: profileDropdownIn 0.18s ease-out;
 }
 
-.logout-button {
-  width: 100%;
+.profile-dropdown-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 12px;
+  min-height: 56px;
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid #eee8df;
+}
+
+.profile-dropdown-header > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.profile-dropdown-header strong {
+  max-width: 150px;
+  overflow: hidden;
+  color: #50120f;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-dropdown-header div span {
+  color: #7a6f67;
+  font-size: 11px;
+}
+
+.profile-dropdown-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f7f1e8;
+  color: #681813;
+}
+
+.profile-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.logout-button {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 10px;
   border: none;
   border-radius: 8px;
   background: transparent;
@@ -1161,6 +1689,22 @@ Remember me dan forgot password
   color: #50120f;
 }
 
+.logout-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+}
+
+.logout-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 @keyframes profileDropdownIn {
   from {
     opacity: 0;
@@ -1170,6 +1714,15 @@ Remember me dan forgot password
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-profile,
+  .profile-chevron,
+  .profile-dropdown {
+    transition: none;
+    animation: none;
   }
 }
 
@@ -1706,7 +2259,20 @@ tbody tr:nth-child(even) {
   }
 
   .sidebar-profile {
-    margin: 12px 16px 20px;
+    width: calc(100% - 32px);
+    min-height: 64px;
+    margin: 12px 16px 16px;
+  }
+
+  .profile-information strong,
+  .profile-dropdown-header strong {
+    max-width: none;
+  }
+
+  .profile-dropdown {
+    left: 16px;
+    bottom: 76px;
+    width: calc(100% - 32px);
   }
 
   .kpi-grid {

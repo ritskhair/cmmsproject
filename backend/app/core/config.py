@@ -13,6 +13,12 @@ if not DATABASE_URL:
 		"dan isi URL PostgreSQL yang valid."
 	)
 
+SILO_DATABASE_URL = os.getenv("SILO_DATABASE_URL", "").strip()
+SILO_CONNECTION_TIMEOUT_SECONDS = int(os.getenv("SILO_CONNECTION_TIMEOUT_SECONDS", "5"))
+SILO_POOL_SIZE = int(os.getenv("SILO_POOL_SIZE", "2"))
+SILO_MAX_OVERFLOW = int(os.getenv("SILO_MAX_OVERFLOW", "0"))
+SILO_DATA_TIMEOUT_SECONDS = int(os.getenv("SILO_DATA_TIMEOUT_SECONDS", "300"))
+
 DB_BOOTSTRAP_ADMIN_DATABASE = os.getenv("DB_BOOTSTRAP_ADMIN_DATABASE", "postgres").strip()
 if not DB_BOOTSTRAP_ADMIN_DATABASE:
 	raise RuntimeError("DB_BOOTSTRAP_ADMIN_DATABASE tidak boleh kosong.")

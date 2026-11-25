@@ -9,6 +9,7 @@ import OperatorWorkOrders from "./pages/Section 5 - Work Orders/02 - Operator Wo
 import OperatorChoice from "./pages/Section 5 - Work Orders/00 - Operator Choice";
 import OperatorApproval from "./pages/Section 5 - Work Orders/03 - Operator Approval";
 import UserManagement from "./pages/Section 4 - User Management/01 - User Management";
+import SiloMonitoring from "./pages/Section 6 - Silo Monitoring/01 - Silo Monitoring";
 
 import DashboardLayout from "./component/DashboardLayout";
 import OperatorLayout from "./component/OperatorLayout";
@@ -50,6 +51,9 @@ export default function App() {
             </Route>
             <Route element={<RequireRoleAccess permission="user-management" />}>
               <Route path="/user-management" element={<UserManagement />} />
+            </Route>
+            <Route element={<RequireRoleAccess permission="silo-monitoring" />}>
+              <Route path="/silo-monitoring" element={<SiloMonitoring />} />
             </Route>
           </Route>
         </Route>
