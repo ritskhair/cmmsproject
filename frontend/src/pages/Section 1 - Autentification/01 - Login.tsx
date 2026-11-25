@@ -10,34 +10,31 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(() => Boolean(localStorage.getItem("cmmsRememberedEmail")));
   const [error, setError] = useState("");
+  const [operatorError, setOperatorError] = useState("");
 
-  const handleSignIn = async (
-  event: React.FormEvent<HTMLFormElement>
-) => {
-  event.preventDefault();
-  setError("");
-
-  try {
-    const result = await apiRequest<AccountLoginResponse>("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ username: email, password }),
-    });
+  const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setError("");
-    const role = result.role as UserRole;
-    saveAuthSession(role, email, role, result.token);
 
-    setShowSuccess(true);
+    try {
+      const result = await apiRequest<AccountLoginResponse>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ username: email, password }),
+      });
+      const role = result.role as UserRole;
+      saveAuthSession(role, email, role, result.token);
 
-    setTimeout(() => {
-      navigate(getLandingPath(role));
-    }, 1500);
-  } catch (requestError) {
-    setError(requestError instanceof Error ? requestError.message : "Login gagal.");
-  }
-};
+      setShowSuccess(true);
+      setTimeout(() => {
+        navigate(getLandingPath(role));
+      }, 1500);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Login gagal.");
+    }
+  };
 
   const handleOperatorLogin = async () => {
-    setError("");
+    setOperatorError("");
 
     try {
       const result = await apiRequest<OperatorLoginResponse>("/auth/operator", {
@@ -47,14 +44,13 @@ export default function Login() {
       setShowSuccess(true);
       setTimeout(() => navigate("/operator"), 1500);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Login operator gagal.");
+      setOperatorError(requestError instanceof Error ? requestError.message : "Login operator gagal.");
     }
   };
 
   return (
     <main className="login-page">
       <section className="login-container">
-        {/* Panel kiri */}
         <div className="login-brand-panel">
           <div className="brand-content">
             <div className="login-brand-row">
@@ -79,23 +75,21 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Panel kanan */}
         <div className="login-form-panel">
           <div className="login-content">
             <div className="login-heading">
               <h2>Welcome back</h2>
-
               <p>Sign in to continue to your maintenance workspace.</p>
             </div>
 
             <form onSubmit={handleSignIn} className="login-form">
-              {/* Username */}
               <div className="input-group">
-                <label htmlFor="email">Username</label>
-
+                <label htmlFor="login-username">Username</label>
                 <input
-                  id="email"
+                  id="login-username"
+                  name="username"
                   type="text"
+                  autoComplete="username"
                   placeholder="Username"
                   value={email}
                   onChange={(event) => {
@@ -106,13 +100,13 @@ export default function Login() {
                 />
               </div>
 
-              {/* Password */}
               <div className="input-group">
-                <label htmlFor="password">Password</label>
-
+                <label htmlFor="login-password">Password</label>
                 <input
-                  id="password"
+                  id="login-password"
+                  name="password"
                   type="password"
+                  autoComplete="current-password"
                   placeholder="Masukkan password"
                   value={password}
                   onChange={(event) => {
@@ -123,38 +117,22 @@ export default function Login() {
                 />
               </div>
 
-              {/* Remember me dan Forgot password */}
-              <div className="login-options">
-                <label className="remember-me">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(event) =>
-                      setRememberMe(event.target.checked)
-                    }
-                  />
+              <label className="remember-me">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(event) => setRememberMe(event.target.checked)}
+                />
+                <span>Remember me</span>
+              </label>
 
-                  <span>Remember me</span>
-                </label>
+              {error && <p className="login-error" role="alert">{error}</p>}
+              {operatorError && <p className="login-error operator-login-error" role="alert">{operatorError}</p>}
 
-                {/*<button
-                  type="button"
-                  className="forgot-password"
-                  onClick={handleForgotPassword}
-                >
-                  Forgot password?
-                </button>*/}
-              </div>
-
-              {/* Pesan error */}
-              {error && <p className="login-error">{error}</p>}
-
-              {/* Tombol login */}
               <div className="login-buttons">
                 <button type="submit" className="sign-in-button">
                   Sign in
                 </button>
-
                 <button
                   type="button"
                   className="operator-login-button"
@@ -165,46 +143,21 @@ export default function Login() {
               </div>
             </form>
 
-            {/* Register */}
-            {/*<button
-              type="button"
-              className="create-account-button"
-              onClick={handleCreateAccount}
-            >
-              New to CMMS?&nbsp; Create an account
-            </button>*/}
-
-            {/* Footer */}
-            <p className="login-footer">
-              © 2026 CMMS • Engineering Maintenance
-            </p>
+            <p className="login-footer">© 2026 CMMS • Engineering Maintenance</p>
           </div>
         </div>
       </section>
-            {showSuccess && (
-        <div className="success-overlay">
-          <div className="success-notification">
-            <div className="success-icon">
-              <svg
-                viewBox="0 0 52 52"
-                aria-hidden="true"
-              >
-                <circle
-                  className="success-circle"
-                  cx="26"
-                  cy="26"
-                  r="25"
-                />
 
-                <path
-                  className="success-check"
-                  d="M14 27 L22 35 L38 18"
-                />
+      {showSuccess && (
+        <div className="success-overlay">
+          <div className="success-notification" role="status" aria-live="polite">
+            <div className="success-icon">
+              <svg viewBox="0 0 52 52" aria-hidden="true">
+                <circle className="success-circle" cx="26" cy="26" r="25" />
+                <path className="success-check" d="M14 27 L22 35 L38 18" />
               </svg>
             </div>
-
             <h2>Berhasil</h2>
-
             <p>
               Login berhasil dilakukan, silahkan
               <br />
