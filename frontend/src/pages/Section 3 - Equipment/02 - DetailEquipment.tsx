@@ -3,7 +3,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { apiRequest, type Component, type Equipment, type Section } from "../../utils/api";
+import { getUserInitials } from "../../utils/auth";
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import SyncStatusBar from "../../component/SyncStatusBar";
 
 type HistoryItem = {
   id: string;
@@ -81,7 +83,8 @@ export default function EquipmentDetail() {
   useEffect(() => {
     void loadDetails();
   }, [loadDetails]);
-  const { lastUpdated, isRefreshing } = useAutoRefresh(loadDetails, { enabled: Boolean(equipmentId) });
+  const { lastUpdated, isRefreshing, hasError, refreshNow } = useAutoRefresh(loadDetails, { enabled: Boolean(equipmentId) });
+  const userInitials = getUserInitials();
 
   // Close component menu when clicking outside
   useEffect(() => {
@@ -218,9 +221,14 @@ export default function EquipmentDetail() {
       {/* HEADER */}
       <header className="page-header">
         <h1>Equipment Detail</h1>
-        <div className="header-profile">SA</div>
+        <div className="header-profile" aria-label="Profil pengguna aktif">{userInitials}</div>
       </header>
-      <p className="refresh-status" aria-live="polite">{isRefreshing ? "Memperbarui data..." : lastUpdated ? `Diperbarui ${lastUpdated.toLocaleTimeString()}` : "Memuat data..."}</p>
+      <SyncStatusBar
+        isRefreshing={isRefreshing}
+        lastUpdated={lastUpdated}
+        hasError={hasError || Boolean(error)}
+        onRefresh={() => void refreshNow()}
+      />
 
       {/* EQUIPMENT TITLE STRIP — editable */}
       {editingEquipment ? (

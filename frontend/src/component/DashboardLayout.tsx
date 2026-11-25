@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { canAccess, clearAuthSession, getAuthSession, type AppPermission, type UserRole } from "../utils/auth";
+import { canAccess, clearAuthSession, getAuthSession, getUserInitials, type AppPermission, type UserRole } from "../utils/auth";
 import EwoNotificationStack from "./EwoNotificationStack";
 
 type SidebarIconName = "dashboard" | "work-orders" | "equipment" | "user-management" | "silo-monitoring";
@@ -93,12 +93,7 @@ export default function DashboardLayout() {
   const session = getAuthSession();
   const roleLabel = session?.role && roleLabels[session.role] ? roleLabels[session.role] : "USER";
   const accountName = session?.email?.trim() || "Pengguna";
-  const accountInitial = accountName
-    .split(/[\s@._-]+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("") || "CM";
+  const accountInitial = getUserInitials(session);
 
   const closeMobileSidebar = () => {
     setIsMobileSidebarOpen(false);

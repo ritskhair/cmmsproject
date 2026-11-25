@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { apiRequest, type Equipment, type EwoRequest } from "../../utils/api";
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
-import { getAuthSession } from "../../utils/auth";
+import { getAuthSession, getUserInitials } from "../../utils/auth";
+import SyncStatusBar from "../../component/SyncStatusBar";
 
 type CompletionForm = {
   condition_after_repair: string;
@@ -43,8 +44,10 @@ export default function WorkOrders() {
   }
 
   useEffect(() => { void loadData(); }, []);
-  const { lastUpdated, isRefreshing } = useAutoRefresh(loadData);
-  const isSuperAdmin = getAuthSession()?.role === "super_admin";
+  const { lastUpdated, isRefreshing, hasError, refreshNow } = useAutoRefresh(loadData);
+  const authSession = getAuthSession();
+  const isSuperAdmin = authSession?.role === "super_admin";
+  const userInitials = getUserInitials(authSession);
 
   async function deleteHistory(ewo: EwoRequest) {
     if (!window.confirm(`Hapus History EWO ${ewo.ewo_number}? Tindakan ini tidak dapat dibatalkan.`)) return;
@@ -115,9 +118,14 @@ export default function WorkOrders() {
     <div className="work-orders-page work-orders-background">
       <header className="page-header">
         <div><h1>Work Orders</h1><p>Open, Completing, dan History Emergency Work Order</p></div>
-        <div className="profile-initial">MT</div>
+        <div className="profile-initial" aria-label="Profil pengguna aktif">{userInitials}</div>
       </header>
-      <p className="refresh-status" aria-live="polite">{isRefreshing ? "Memperbarui data..." : lastUpdated ? `Diperbarui ${lastUpdated.toLocaleTimeString()}` : "Memuat data..."}</p>
+      <SyncStatusBar
+        isRefreshing={isRefreshing}
+        lastUpdated={lastUpdated}
+        hasError={hasError || Boolean(error)}
+        onRefresh={() => void refreshNow()}
+      />
       {error && <p className="login-error">{error}</p>}
       <section className="ewo-kpi-grid">
         <div className="ewo-kpi-card"><span>Open EWO</span><strong>{open.length}</strong></div>

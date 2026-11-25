@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { apiRequest, type Component, type EwoRequest, type Equipment } from "../../utils/api";
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import SyncStatusBar from "../../component/SyncStatusBar";
 
 export default function OperatorApproval() {
   const [ewos, setEwos] = useState<EwoRequest[]>([]);
@@ -36,7 +37,7 @@ export default function OperatorApproval() {
   }
 
   useEffect(() => { void loadData(); }, []);
-  const { lastUpdated, isRefreshing } = useAutoRefresh(loadData);
+  const { lastUpdated, isRefreshing, hasError, refreshNow } = useAutoRefresh(loadData);
 
   async function selectEwo(ewo: EwoRequest) {
     setSelected(ewo);
@@ -87,7 +88,12 @@ export default function OperatorApproval() {
         </div>
       </div>
       {error && <p className="login-error">{error}</p>}
-      <p className="refresh-status" aria-live="polite">{isRefreshing ? "Memperbarui data..." : lastUpdated ? `Diperbarui ${lastUpdated.toLocaleTimeString()}` : "Memuat data..."}</p>
+      <SyncStatusBar
+        isRefreshing={isRefreshing}
+        lastUpdated={lastUpdated}
+        hasError={hasError || Boolean(error)}
+        onRefresh={() => void refreshNow()}
+      />
       <div className="operator-approval-grid">
         <div className="operator-approval-list">
           <h2>Open EWO</h2>

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type DashboardSummary, type FailureBySection, fetchDashboardSummary } from "../../utils/api";
+import { getUserInitials } from "../../utils/auth";
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import SyncStatusBar from "../../component/SyncStatusBar";
 import {
   Bar,
   CartesianGrid,
@@ -38,37 +40,56 @@ function formatDisplayDate(iso: string): string {
   return `${parseInt(day)} ${monthNames[parseInt(month) - 1]} ${year}`;
 }
 
-// ─── colour tokens ──────────────────────────────────────────────────────────
+// ─── colour tokens (mapped to CSS design tokens) ────────────────────────────
 
 const colors = {
-  maroon: "#681813",
-  gold: "#C9A227",
-  goldLight: "#E3C770",
-  background: "#F6F5F2",
-  text: "#211F1D",
-  secondary: "#5C5954",
-  border: "#D6D1C9",
-  green: "#2E7D33",
-  orange: "#B8781F",
-  red: "#B22417",
-  white: "#ffffff",
+  maroon: "var(--color-primary)",
+  gold: "var(--color-accent)",
+  goldLight: "var(--color-accent-light)",
+  background: "var(--color-bg)",
+  text: "var(--color-text)",
+  secondary: "var(--color-text-secondary)",
+  border: "var(--color-border)",
+  green: "var(--color-success)",
+  orange: "var(--color-warning)",
+  red: "var(--color-danger)",
+  white: "var(--color-surface)",
 };
 
 // ─── sub-components ─────────────────────────────────────────────────────────
 
-function KpiCard({ title, value, sub }: { title: string; value: string; sub?: string }) {
+function KpiCard({
+  title,
+  value,
+  sub,
+  loading = false,
+}: {
+  title: string;
+  value: string;
+  sub?: string;
+  loading?: boolean;
+}) {
   return (
-    <div className="dashboard-kpi-card">
-      <div style={{ color: colors.secondary, fontSize: "11px", fontWeight: 700 }}>
+    <div className="dashboard-kpi-card" aria-busy={loading}>
+      <div style={{ color: colors.secondary, fontSize: "var(--text-xs)", fontWeight: 700 }}>
         {title}
       </div>
-      <div style={{ marginTop: "10px", color: colors.maroon, fontSize: "26px", fontWeight: 700 }}>
-        {value}
-      </div>
-      {sub && (
-        <div style={{ marginTop: "8px", fontSize: "10px", color: colors.secondary }}>
-          {sub}
-        </div>
+      {loading ? (
+        <>
+          <div className="skeleton-block" style={{ marginTop: "12px", height: "28px", width: "64%" }} />
+          <div className="skeleton-block" style={{ marginTop: "10px", height: "12px", width: "80%" }} />
+        </>
+      ) : (
+        <>
+          <div style={{ marginTop: "10px", color: colors.maroon, fontSize: "26px", fontWeight: 700 }}>
+            {value}
+          </div>
+          {sub && (
+            <div style={{ marginTop: "8px", fontSize: "var(--text-xs)", color: colors.secondary }}>
+              {sub}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -391,9 +412,10 @@ export default function MaintenanceDashboard() {
     loadSummary(dateFrom, dateTo, section);
   }, [dateFrom, dateTo, section, loadSummary]);
   /* eslint-enable react-hooks/set-state-in-effect */
-  const { lastUpdated, isRefreshing } = useAutoRefresh(
+  const { lastUpdated, isRefreshing, hasError, refreshNow } = useAutoRefresh(
     () => loadSummary(dateFrom, dateTo, section),
   );
+  const userInitials = getUserInitials();
 
   const handleFilterApply = (from: string, to: string, sec: string) => {
     setDateFrom(from);
@@ -435,11 +457,6 @@ export default function MaintenanceDashboard() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {loading && (
-            <span style={{ fontSize: "11px", color: colors.secondary, fontStyle: "italic" }}>
-              Memuat…
-            </span>
-          )}
           <button
             type="button"
             className="dashboard-filter-btn"
@@ -447,26 +464,17 @@ export default function MaintenanceDashboard() {
           >
             <span style={{ fontSize: "16px" }}>⚙</span> Filter
           </button>
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              background: colors.background,
-              border: `1px solid ${colors.border}`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: colors.maroon,
-              fontSize: "11px",
-              fontWeight: 700,
-            }}
-          >
-            ADM
+          <div className="header-profile" aria-label="Profil pengguna aktif">
+            {userInitials}
           </div>
         </div>
       </header>
-      <p className="refresh-status" aria-live="polite">{isRefreshing ? "Memperbarui data..." : lastUpdated ? `Diperbarui ${lastUpdated.toLocaleTimeString()}` : "Memuat data..."}</p>
+      <SyncStatusBar
+        isRefreshing={isRefreshing || loading}
+        lastUpdated={lastUpdated}
+        hasError={hasError || Boolean(error)}
+        onRefresh={() => void refreshNow()}
+      />
 
       {/* FILTER PANEL OVERLAY */}
       {filterOpen && (
@@ -498,27 +506,31 @@ export default function MaintenanceDashboard() {
       )}
 
       {/* KPI CARDS */}
-      <section className="dashboard-kpi-grid">
-        <KpiCard title="MTTR" value={mttrDisplay} sub="rata-rata waktu perbaikan" />
+      <section className="dashboard-kpi-grid" aria-busy={loading && !summary}>
+        <KpiCard title="MTTR" value={mttrDisplay} sub="rata-rata waktu perbaikan" loading={loading && !summary} />
         <KpiCard
           title="Total Failures"
           value={summary ? String(summary.total_failures) : "—"}
           sub="EWO dalam periode ini"
+          loading={loading && !summary}
         />
         <KpiCard
           title="Open Work Orders"
           value={summary ? String(summary.open_work_orders) : "—"}
           sub="belum selesai"
+          loading={loading && !summary}
         />
         <KpiCard
           title="Operational"
           value={equip ? String(equip.operational) : "—"}
           sub={equip ? `${pct(equip.operational)} dari total aset` : undefined}
+          loading={loading && !summary}
         />
         <KpiCard
           title="Warning / Critical"
           value={equip ? `${equip.warning} / ${equip.critical}` : "—"}
           sub="perlu perhatian"
+          loading={loading && !summary}
         />
       </section>
 
@@ -534,8 +546,8 @@ export default function MaintenanceDashboard() {
             borderRadius: "12px",
           }}
         >
-          <h2 style={{ margin: 0, fontSize: "15px", color: colors.text }}>Equipment Status</h2>
-          <p style={{ margin: "5px 0 15px", color: colors.secondary, fontSize: "11px" }}>
+          <h2 style={{ margin: 0, fontSize: "var(--text-md)", color: colors.text }}>Equipment Status</h2>
+          <p style={{ margin: "5px 0 15px", color: colors.secondary, fontSize: "var(--text-xs)" }}>
             Ketersediaan aset saat ini
           </p>
 
@@ -557,7 +569,7 @@ export default function MaintenanceDashboard() {
                 marginBottom: "12px",
                 background: colors.background,
                 borderRadius: "8px",
-                fontSize: "11px",
+                fontSize: "var(--text-xs)",
               }}
             >
               <span

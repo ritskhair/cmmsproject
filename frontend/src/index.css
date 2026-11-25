@@ -1,7 +1,38 @@
 :root {
+  --color-primary: #681813;
+  --color-primary-hover: #50120f;
+  --color-primary-soft: #f3e8e5;
+  --color-accent: #c9a227;
+  --color-accent-light: #e3c770;
+  --color-bg: #f6f5f2;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f9fafb;
+  --color-text: #211f1d;
+  --color-text-secondary: #5c5954;
+  --color-text-muted: #64748b;
+  --color-border: #d6d1c9;
+  --color-success: #2e7d33;
+  --color-warning: #b8781f;
+  --color-danger: #b22417;
+  --color-danger-bg: #fef2f2;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --text-2xl: 28px;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 2px 8px rgba(33, 31, 29, 0.06);
+  --shadow-md: 0 12px 30px rgba(53, 24, 19, 0.14);
+
   font-family: Inter, Arial, sans-serif;
-  color: #211f1d;
-  background: #f6f5f2;
+  color: var(--color-text);
+  background: var(--color-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -44,8 +75,126 @@ body {
 
 .refresh-status {
   margin: 0 0 12px;
-  color: #64748b;
-  font-size: 11px;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.sync-status-bar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.sync-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  flex: 0 0 8px;
+}
+
+.sync-status-dot.syncing {
+  background: var(--color-warning);
+  animation: syncPulse 1.2s ease-in-out infinite;
+}
+
+.sync-status-dot.error {
+  background: var(--color-danger);
+}
+
+.sync-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.sync-refresh-btn:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.sync-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sync-refresh-icon {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sync-refresh-icon.spinning {
+  animation: spin360 0.9s linear infinite;
+}
+
+.skeleton-block {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: #e7e3dc;
+}
+
+.skeleton-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes syncPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes spin360 {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-block::after,
+  .sync-status-dot.syncing,
+  .sync-refresh-icon.spinning {
+    animation: none;
+  }
 }
 
 .delete-history-button {
@@ -897,7 +1046,7 @@ button:hover {
 
 .login-page::before {
   z-index: -2;
-  background: url("/pohon.jpg") center / cover no-repeat;
+  background: url("/pohon.webp") center / cover no-repeat;
   opacity: 0.36;
   filter: saturate(0.2) contrast(1.05) brightness(0.85);
 }
@@ -934,7 +1083,7 @@ button:hover {
   border-right: 1px solid rgba(255, 255, 255, 0.14);
   background:
     linear-gradient(155deg, rgba(104, 24, 19, 0.78), rgba(48, 9, 7, 0.88)),
-    url("/work-orders-background.png") center / cover no-repeat;
+    url("/work-orders-background.webp") center / cover no-repeat;
   color: #ffffff;
   backdrop-filter: blur(6px);
 }
@@ -2549,7 +2698,7 @@ tbody tr:nth-child(even) {
   background-color: #f7f3ed;
   background-image:
     linear-gradient(rgba(247, 243, 237, 0.88), rgba(247, 243, 237, 0.94)),
-    url("/work-orders-background.png");
+    url("/work-orders-background.webp");
   background-position: center;
   background-size: cover;
   background-attachment: fixed;

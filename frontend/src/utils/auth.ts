@@ -75,3 +75,16 @@ export function getLandingPath(role: UserRole) {
   if (canAccess(role, "dashboard")) return "/dashboard";
   return "/work-orders";
 }
+
+export function getUserInitials(session: AuthSession | null = getAuthSession()): string {
+  const accountName = session?.email?.trim() || "";
+  if (!accountName) return "CM";
+  return (
+    accountName
+      .split(/[\s@._-]+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join("") || "CM"
+  );
+}

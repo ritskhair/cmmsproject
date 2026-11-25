@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { apiRequest, type Equipment, type Section } from "../../utils/api";
-import { getAuthSession, isOperatorRole } from "../../utils/auth";
+import { getAuthSession, getUserInitials, isOperatorRole } from "../../utils/auth";
 import ImportEquipmentModal from "./ImportEquipmentModal";
 import TaskCatalogImportModal from "./TaskCatalogImportModal";
 import { useAutoRefresh } from "../../hooks/useAutoRefresh";
+import SyncStatusBar from "../../component/SyncStatusBar";
 
 const statuses = ["Operational", "Warning", "Critical"] as const;
 
@@ -27,6 +28,7 @@ export default function EquipmentList() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [sectionFilter, setSectionFilter] = useState("");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -41,6 +43,7 @@ export default function EquipmentList() {
 
   const authSession = getAuthSession();
   const isSuperAdmin = authSession?.role === "super_admin";
+  const userInitials = getUserInitials(authSession);
 
 
   useEffect(() => {
@@ -59,6 +62,8 @@ export default function EquipmentList() {
       setError("");
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Equipment gagal dimuat.");
+    } finally {
+      setLoading(false);
     }
   }, [sectionFilter, statusFilter]);
 
@@ -66,7 +71,7 @@ export default function EquipmentList() {
   useEffect(() => {
     void loadEquipment();
   }, [loadEquipment]);
-  const { lastUpdated, isRefreshing } = useAutoRefresh(loadEquipment);
+  const { lastUpdated, isRefreshing, hasError, refreshNow } = useAutoRefresh(loadEquipment);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const filteredEquipment = useMemo(() => {
@@ -87,9 +92,14 @@ export default function EquipmentList() {
 
   return (
     <div className="page-container">
-      <header className="page-header"><h1>Equipment</h1><div className="header-profile">SA</div></header>
+      <header className="page-header"><h1>Equipment</h1><div className="header-profile" aria-label="Profil pengguna aktif">{userInitials}</div></header>
       <p className="page-description">Asset registry, condition and maintenance readiness</p>
-      <p className="refresh-status" aria-live="polite">{isRefreshing ? "Memperbarui data..." : lastUpdated ? `Diperbarui ${lastUpdated.toLocaleTimeString()}` : "Memuat data..."}</p>
+      <SyncStatusBar
+        isRefreshing={isRefreshing || loading}
+        lastUpdated={lastUpdated}
+        hasError={hasError || Boolean(error)}
+        onRefresh={() => void refreshNow()}
+      />
       <section className="equipment-filters">
         <div className="filter-group search-filter"><label htmlFor="equipment-search">Search equipment</label><input id="equipment-search" placeholder="Asset ID / name" value={search} onChange={(event) => setSearch(event.target.value)} /></div>
         <div className="filter-group"><label htmlFor="status-filter">Status</label><select id="status-filter" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="">All statuses</option>{statuses.map((status) => <option key={status}>{status}</option>)}</select></div>
@@ -118,7 +128,7 @@ export default function EquipmentList() {
       {showForm && <section className="equipment-form-card"><div className="equipment-form-header"><div><h2>Add Equipment</h2><p>Register a machine under a section.</p></div><button type="button" className="secondary-button" onClick={() => setShowForm(false)}>Cancel</button></div><div className="equipment-form-grid"><div className="filter-group"><label htmlFor="add-equipment-asset-id">Asset ID</label><input id="add-equipment-asset-id" placeholder="e.g. MCH-001" value={form.asset_id} onChange={(event) => setForm({ ...form, asset_id: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-name">Machine name</label><input id="add-equipment-name" placeholder="e.g. Pellet Mill 01" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-type">Machine type</label><input id="add-equipment-type" placeholder="e.g. Motor" value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })} /></div><div className="filter-group"><label htmlFor="add-equipment-section">Section</label><select id="add-equipment-section" value={form.section} onChange={(event) => setForm({ ...form, section: event.target.value })}>{sections.map((section) => <option key={section.code} value={section.code}>{section.name}</option>)}</select></div><div className="filter-group"><label htmlFor="add-equipment-priority">Priority</label><select id="add-equipment-priority" value={form.priority ?? ""} onChange={(event) => setForm({ ...form, priority: event.target.value === "" ? null : event.target.value as Equipment["priority"] })}><option value="">Belum diisi</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></div></div><div className="equipment-form-actions"><button type="button" className="primary-button" onClick={() => void addEquipment()}>Save Equipment</button></div></section>}
       {error && <p className="login-error">{error}</p>}
       <section className="equipment-summary"><div><span>Total Assets</span><strong>{equipment.length}</strong></div><div><span>Operational</span><strong className="text-green">{equipment.filter((item) => item.status === "Operational").length}</strong></div><div><span>Warning</span><strong className="text-orange">{equipment.filter((item) => item.status === "Warning").length}</strong></div><div><span>Critical</span><strong className="text-red">{equipment.filter((item) => item.status === "Critical").length}</strong></div></section>
-      <section className="equipment-hierarchy"><div className="table-card"><div className="table-scroll"><table><thead><tr><th>Asset ID</th><th>Machine</th><th>Section</th><th>Type</th><th>Priority</th><th>Status</th><th>Last PM</th></tr></thead><tbody>{filteredEquipment.map((item) => <tr key={item.id}><td><Link to={`/equipment/${item.id}`} className="equipment-link">{item.asset_id}</Link></td><td><Link to={`/equipment/${item.id}`} className="equipment-name-link">{item.name}</Link></td><td>{item.section}</td><td>{item.type}</td><td><span className={item.priority ? `priority-badge priority-${item.priority.toLowerCase()}` : ""}>{item.priority ?? "-"}</span></td><td><span className={`status-text ${getStatusClass(item.status)}`}>{item.status}</span></td><td>{item.last_pm ? new Date(item.last_pm).toLocaleString() : "-"}</td></tr>)}</tbody></table></div>{filteredEquipment.length === 0 && <p className="empty-state">Equipment tidak ditemukan.</p>}</div>
+      <section className="equipment-hierarchy"><div className="table-card" aria-busy={loading && equipment.length === 0}><div className="table-scroll"><table><thead><tr><th>Asset ID</th><th>Machine</th><th>Section</th><th>Type</th><th>Priority</th><th>Status</th><th>Last PM</th></tr></thead><tbody>{loading && equipment.length === 0 ? Array.from({ length: 5 }).map((_, index) => <tr key={`skeleton-${index}`}>{Array.from({ length: 7 }).map((__, cellIndex) => <td key={cellIndex}><div className="skeleton-block" style={{ height: "16px", width: cellIndex === 1 ? "85%" : "65%" }} /></td>)}</tr>) : filteredEquipment.map((item) => <tr key={item.id}><td><Link to={`/equipment/${item.id}`} className="equipment-link">{item.asset_id}</Link></td><td><Link to={`/equipment/${item.id}`} className="equipment-name-link">{item.name}</Link></td><td>{item.section}</td><td>{item.type}</td><td><span className={item.priority ? `priority-badge priority-${item.priority.toLowerCase()}` : ""}>{item.priority ?? "-"}</span></td><td><span className={`status-text ${getStatusClass(item.status)}`}>{item.status}</span></td><td>{item.last_pm ? new Date(item.last_pm).toLocaleString() : "-"}</td></tr>)}</tbody></table></div>{!loading && filteredEquipment.length === 0 && <p className="empty-state">Equipment tidak ditemukan.</p>}</div>
       </section>
 
       {/* Super Admin Import Equipment Modal */}
